@@ -1,14 +1,17 @@
-#-------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------#
 # Name:        Create SARA Risk Radii
+#
 # Purpose:     Create risk radii for a user selected SARA facility
-#              User enters the PATTS ID for the facility, buffer distances, and buffer units.
+#
+# Summary:     User enters the PATTS ID for the facility, buffer distances, and buffer units.
 #              The script checks to see if the input PATTS ID exists in the SARA layer.
 #              If so, the script runs a multi-ring buffer within a try/except block.
-# Author:      Patrick McKinney#
+#
+# Author:      Patrick McKinney
 # Created:     03/17/2016
 # Copyright:   (c) Cumberland County GIS 2016
 # Licence:     <your licence>
-#-------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------#
 
 # Import arcpy
 import arcpy
