@@ -23,7 +23,7 @@ sara = arcpy.GetParameterAsText(0)
 # Regional U.S. Census Blocks - clipping feature
 censusBlocks = r'C:\GIS\Geodata.gdb\SARA\Regional_Census2010_Blocks_SPS'
 # Output of Clip Operation
-output = arcpy.GetParameterAsText(1)
+#output = arcpy.GetParameterAsText(1)
 
 # Search cursor for SARA Facility
 cursor = arcpy.SearchCursor(sara)
@@ -33,16 +33,22 @@ try:
         # Clip US Census Blocks layer by SARA Facility record
         # Clip feature
         feat = row.Shape
+        # PATTS ID
+        pattsID = str(row.PATTS)
         # Buffer units
         buffUnits = row.UNITS
         # Buffer distance
         buffDist = str(int(row.BUFFDIST))
         # Buffer units and distance
         buffAppend = '_{}_{}'.format(buffUnits, buffDist)
+        # Output
+        output = r'\\ccpasr34\psep$\GIS\SARA\PopEstimates.gdb'
+        # Output appended text for clip
+        outputAppend = 'EstCensusPop_{}_{}'.format(pattsID, buffAppend)
         # Boiler place text for ArcPy message
-        messageText = '{}-{} risk radius'.format(buffDist, buffUnits)
+        messageText = 'PATTS {} {}-{} risk radius'.format(pattsID,patbuffDist, buffUnits)
         # Execute Clip tool
-        newInput = arcpy.Clip_analysis(censusBlocks, feat, output + buffAppend)
+        newInput = arcpy.Clip_analysis(censusBlocks, feat, output + outputAppend)
         # Add message that Clip is completed
         arcpy.AddMessage('Census Blocks clipped for ' + messageText)
         # Add field to hold clip area to original area ratio
@@ -70,7 +76,7 @@ try:
         # Add message that Estimated Population has been calculated
         arcpy.AddMessage('Estimated population calculated for ' + messageText)
         # Calculate the total assumed population and export to dBASE table
-        outTable = output + buffAppend + '_SumPop'
+        outTable = output + outputAppend + '_SumPop'
         statsFields = [['ESTPOP', 'SUM']]
         arcpy.Statistics_analysis(newInput, outTable, statsFields)
         # Add message that estimated population sum table created
