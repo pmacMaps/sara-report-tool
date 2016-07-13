@@ -22,33 +22,39 @@ import arcpy
 sara = arcpy.GetParameterAsText(0)
 # Regional U.S. Census Blocks - clipping feature
 censusBlocks = r'C:\GIS\Geodata.gdb\Regional_Census2010_Blocks_SPS'
-# Output of Clip Operation
-#output = arcpy.GetParameterAsText(1)
 
 # Search cursor for SARA Facility
 cursor = arcpy.SearchCursor(sara)
 try:
+    fileCount = 0
     # Loop through records of SARA Facility
     for row in cursor:
+        fileCount += 1
         # Clip US Census Blocks layer by SARA Facility record
         # Clip feature
         feat = row.Shape
+        # Will not have PATTS ID in layer if radius created from lat/long input
+        # Have user enter name or PATTS ID
+        pattsID = arcpy.GetParameterAsText(1)
         # PATTS ID
-        pattsID = str(row.PATTS)
+        #pattsID = str(row.PATTS)
         # Buffer units
-        buffUnits = row.UNITS
+        #buffUnits = row.UNITS
+        # Need a way to replace decimal with dash for buffer distances
         # Buffer distance
-        buffDist = str(int(row.BUFFDIST))
+        #buffDist = str(int(row.BUFFDIST))
         # Buffer units and distance
-        buffAppend = '_{}_{}'.format(buffUnits, buffDist)
+        #buffAppend = '{}_{}'.format(buffUnits, buffDist)
         # Output
-        output = r'\\ccpasr34\psep$\GIS\SARA\PopEstimates.gdb'
+        outputLocation = r'\\ccpasr34\psep$\GIS\SARA\PopEstimates.gdb\\'
         # Output appended text for clip
-        outputAppend = 'EstCensusPop_{}_{}'.format(pattsID, buffAppend)
+        #outputAppend = 'EstCensusPop_{}_{}'.format(pattsID, buffAppend)
+        outputAppend = 'EstCensusPop_{}_{}'.format(pattsID, fileCount)
         # Boiler place text for ArcPy message
-        messageText = 'PATTS {} {}-{} risk radius'.format(pattsID,patbuffDist, buffUnits)
+        # messageText = 'PATTS {} {}-{} risk radius'.format(pattsID, buffDist, buffUnits)
+        messageText = 'PATTS {} risk radius #{}'.format(pattsID, fileCount)
         # Execute Clip tool
-        newInput = arcpy.Clip_analysis(censusBlocks, feat, output + outputAppend)
+        newInput = arcpy.Clip_analysis(censusBlocks, feat, outputLocation + outputAppend)
         # Add message that Clip is completed
         arcpy.AddMessage('Census Blocks clipped for ' + messageText)
         # Add field to hold clip area to original area ratio
@@ -76,11 +82,12 @@ try:
         # Add message that Estimated Population has been calculated
         arcpy.AddMessage('Estimated population calculated for ' + messageText)
         # Calculate the total assumed population and export to dBASE table
-        outTable = output + outputAppend + '_SumPop'
+        outTable = outputLocation + outputAppend + '_SumPop'
         statsFields = [['ESTPOP', 'SUM']]
         arcpy.Statistics_analysis(newInput, outTable, statsFields)
         # Add message that estimated population sum table created
-        arcpy.AddMessage('Table of total estimated population created for ' + buffDist + '-' + buffUnits + ' risk radius')
+        #arcpy.AddMessage('Table of total estimated population created for ' + buffDist + '-' + buffUnits + ' risk radius')
+        arcpy.AddMessage('Table of total estimated population created for PATTS {} risk radius #{}'.format(pattsID, fileCount))
     del cursor, row
 except Exception:
     e = sys.exc_info()[1]
