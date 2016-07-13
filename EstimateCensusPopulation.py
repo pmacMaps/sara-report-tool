@@ -21,7 +21,7 @@ import arcpy
 # SARA Facility - feature to be clipped
 sara = arcpy.GetParameterAsText(0)
 # Regional U.S. Census Blocks - clipping feature
-censusBlocks = r'C:\GIS\Geodata.gdb\SARA\Regional_Census2010_Blocks_SPS'
+censusBlocks = r'C:\GIS\Geodata.gdb\Regional_Census2010_Blocks_SPS'
 # Output of Clip Operation
 #output = arcpy.GetParameterAsText(1)
 
