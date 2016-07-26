@@ -17,9 +17,9 @@
 import arcpy
 
 # User entered variables from ArcGIS tool
-# user entered latitude
+# latitude
 lat = arcpy.GetParameterAsText(0)
-# user entered longitude
+# longitude
 lon = arcpy.GetParameterAsText(1)
 # PATTS ID
 pattsID = arcpy.GetParameterAsText(2)
@@ -55,18 +55,27 @@ try:
     arcpy.MultipleRingBuffer_analysis(outputSPC,mrbOutput,mrbDistances,mrbUnits,mrbDistanceField,mrbDissolveOption)
     # Add message that Multiple Ring Buffer tool complete
     arcpy.AddMessage('SARA Risk Radii created')
-    # Add Field Managment Tool
-    # Add field to output layer with buffer distance units
-    fieldName = 'UNITS'
+    # Add field to output layer with PATTS ID
+    fieldNamePatts = 'PATTS'
     fieldType = 'TEXT'
-    fieldExpression = '"{0}"'.format(mrbUnits)
+    fieldExpressionPatts = '"{0}"'.format(pattsID)
     # Execut Add Field Management tool
-    arcpy.AddField_management(mrbOutput, fieldName,fieldType)
+    arcpy.AddField_management(mrbOutput,fieldNamePatts,fieldType)
+    # Add message that PATTS ID added to layer
+    arcpy.AddMessage('PATTS ID field added')
+    # Calculate PATTS ID to field
+    arcpy.CalculateField_management(mrbOutput, fieldNamePatts, fieldExpressionPatts, 'PYTHON_9.3')
+    # Add message that PATTS ID added to PATTS ID field
+    arcpy.AddMessage('PATTS ID added to PATTS ID field')
+    # Add field to output layer with buffer distance units
+    fieldNameUnits = 'UNITS'
+    fieldExpressionUnits = '"{0}"'.format(mrbUnits)
+    # Execut Add Field Management tool
+    arcpy.AddField_management(mrbOutput, fieldNameUnits,fieldType)
     # Add message that Units field added to layer
     arcpy.AddMessage('UNITS field added')
-    # Calculate Field Managment Tool
     # Calculate buffer distance units
-    arcpy.CalculateField_management(mrbOutput, fieldName, fieldExpression, 'PYTHON_9.3')
+    arcpy.CalculateField_management(mrbOutput, fieldNameUnits, fieldExpressionUnits, 'PYTHON_9.3')
     # Add message that buffer distance units added to Units field
     arcpy.AddMessage('The units ' + mrbUnits + ' added to the UNITS field')
 
