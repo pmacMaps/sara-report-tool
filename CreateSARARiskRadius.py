@@ -16,65 +16,86 @@
 # Import arcpy
 import arcpy
 
-# SARA layer
-sara = r'C:\GIS\Geodata.gdb\SARA'
-# PATTS ID field for SARA
-saraPATTSField = 'PATTS'
-# User selected SARA site by PATTS ID
-# PATTS ID is an integer field in dataset
-pattsID = int(arcpy.GetParameterAsText(0))
-# String version of pattsID
-pattsIDString = str(pattsID)
-# List holding PATTS IDs of SARA sites
-saraList = []
+# User entered variables from ArcGIS tool
 
-# Create a cursor to search the PATTS ID field of SARA
-cur = arcpy.SearchCursor(sara, "", "", saraPATTSField)
-# Add SARA PATTS IDs to list
-for row in cur:
-    saraList.append(row.PATTS)
-del cur, row
+# user entered latitude
+# convert from text to float
+lat = float(arcpy.GetParameterAsText(0))
 
-# Check if user entered PATTS ID exists in SARA layer
-if pattsID in saraList:
-    # SQL statement to apply definition query to SARA layer
-    whereClause = "{} = {}".format(arcpy.AddFieldDelimiters(sara,saraPATTSField), pattsID)
-    # Create in-memory layer of SARA with selected site
-    arcpy.MakeFeatureLayer_management(sara, "mrbInput", whereClause)
+# user entered longitude
+# convert from text to float
+lon = float(arcpy.GetParameterAsText(1))
+
+# PATTS ID
+pattsID = arcpy.GetParameterAsText(2)
+
+# Buffer distances
+mrbDistances = arcpy.GetParameterAsText(3)
+
+# Buffer units - will typically be miles or feet
+mrbUnits = arcpy.GetParameterAsText(4)
+
+
+# Variables for Project tool
+
+# Spatial References
+# WGS 1984
+srWGS84 = arcpy.SpatialReference(4326)
+
+# NAD 1983
+srNAD83 = arcpy.SpatialReference(2272)
+
+# Output
+# Create file GDB for these layers
+outputNAD83 = r'\\CCPASR07\ncgs$\Scripts\ArcGIS Geoprocessing\SARA Tool\SARA_Tool_DEV.gdb\InputPoint_NAD83_{}'.format(pattsID)
+
+
+try:
+    # create point
+    point = arcpy.Point(lon, lat)
+
+    # create geometry point
+    geometryPoint = arcpy.PointGeometry(point, srWGS84)
+
+    # Convert WGS 1984 layer to a NAD 1983 layer
+    arcpy.Project_management(geometryPoint, outputNAD83, srNAD83, "NAD_1983_To_WGS_1984_1", preserve_shape = "PRESERVE_SHAPE")
+
+    # Multi-ring Buffer tool
+
     # Output layer
-    mrbOutput = r'\\Ccpasr34\psep$\GIS\SARA\RiskRadii.gdb\RiskRadii_PATTS_{}'.format(pattsIDString)
-    # Buffer distances
-    mrbDistances = arcpy.GetParameterAsText(1)
-    # Buffer units - will typically be miles or feet
-    mrbUnits = arcpy.GetParameterAsText(2)
+    mrbOutput = r'\\Ccpasr34\psep$\GIS\SARA\RiskRadii.gdb\RiskRadii_PATTS_{}'.format(pattsID)
+
     # Field name in output layer to store buffer distance
     mrbDistanceField = 'BUFFDIST'
+
     # Dissolve option
     mrbDissolveOption = 'NONE'
-    # Run Multiple Ring Buffer, Add Field, and Calculate field tools
-    # only if a valid unit is selected for the buffer
-    try:
-        # Execute Multiple Ring Buffer tool
-        arcpy.MultipleRingBuffer_analysis("mrbInput",mrbOutput,mrbDistances,mrbUnits,mrbDistanceField,mrbDissolveOption)
-        # Add message that Multiple Ring Buffer tool complete
-        arcpy.AddMessage('SARA Risk Radii created')
-        # Add Field Managment Tool
-        # Add field to output layer with buffer distance units
-        fieldName = 'UNITS'
-        fieldType = 'TEXT'
-        fieldExpression = '"{0}"'.format(mrbUnits)
-        # Execut Add Field Management tool
-        arcpy.AddField_management(mrbOutput, fieldName,fieldType)
-        # Add message that Units field added to layer
-        arcpy.AddMessage('UNITS field added')
-        # Calculate Field Managment Tool
-        # Calculate buffer distance units
-        arcpy.CalculateField_management(mrbOutput, fieldName, fieldExpression, 'PYTHON_9.3')
-        # Add message that buffer distance units added to Units field
-        arcpy.AddMessage('The units ' + mrbUnits + ' added to the UNITS field')
-    except Exception:
+
+    # Run tool
+    arcpy.MultipleRingBuffer_analysis(outputNAD83,mrbOutput,mrbDistances,mrbUnits,mrbDistanceField,mrbDissolveOption)
+
+    # Add message that Multiple Ring Buffer tool complete
+    arcpy.AddMessage('SARA Risk Radii created')
+
+    # Add Field Managment Tool
+    # Add field to output layer with buffer distance units
+    fieldName = 'UNITS'
+    fieldType = 'TEXT'
+    fieldExpression = '"{0}"'.format(mrbUnits)
+
+    # Execut Add Field Management tool
+    arcpy.AddField_management(mrbOutput, fieldName,fieldType)
+
+    # Add message that Units field added to layer
+    arcpy.AddMessage('UNITS field added')
+
+    # Calculate Field Managment Tool
+    # Calculate buffer distance units
+    arcpy.CalculateField_management(mrbOutput, fieldName, fieldExpression, 'PYTHON_9.3')
+
+    # Add message that buffer distance units added to Units field
+    arcpy.AddMessage('The units ' + mrbUnits + ' added to the UNITS field')
+
+except Exception:
         e = sys.exc_info()[1]
         arcpy.AddError(e.args[0])
-else:
-    # Add message that invalid PATTS ID entered
-    arcpy.AddError('The SARA facility you entered is not in the database.')
