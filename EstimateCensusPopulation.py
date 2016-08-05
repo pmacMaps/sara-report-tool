@@ -48,7 +48,6 @@ try:
         # Output appended text for clip
         outputAppend = 'EstCensusPop_PATTS_{}_{}_{}'.format(pattsID, buffAppend, fileCount)
         # Boiler place text for ArcPy message
-        # messageText = 'PATTS {} {}-{} risk radius'.format(pattsID, buffDist, buffUnits)
         messageText = 'PATTS {} risk radius {}-{}'.format(pattsID, buffDist, buffUnits)
         # Execute Clip tool
         newInput = arcpy.Clip_analysis(censusBlocks, feat, outputLocation + outputAppend)
@@ -83,8 +82,7 @@ try:
         statsFields = [['ESTPOP', 'SUM']]
         arcpy.Statistics_analysis(newInput, outTable, statsFields)
         # Add message that estimated population sum table created
-        #arcpy.AddMessage('Table of total estimated population created for ' + buffDist + '-' + buffUnits + ' risk radius')
-        arcpy.AddMessage('Table of total estimated population created for PATTS {} risk radius #{}'.format(pattsID, fileCount))
+        arcpy.AddMessage('Table of total estimated population created for PATTS {} risk radius {}-{}'.format(pattsID, buffDist, buffUnits))
     del cursor, row
 except Exception:
     e = sys.exc_info()[1]
