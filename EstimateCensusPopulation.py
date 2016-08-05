@@ -39,17 +39,19 @@ try:
         # PATTS ID
         #pattsID = str(row.PATTS)
         # Buffer units
-        #buffUnits = row.UNITS
+        buffUnits = row.UNITS
         # Need a way to replace decimal with dash for buffer distances
         # Buffer distance
-        #buffDist = str(int(row.BUFFDIST))
+        buffDist = str(row.BUFFDIST)
+        # Replace . with _ in buffer distance
+        buffDistReplace = buffDist.replace('.', '_')
         # Buffer units and distance
-        #buffAppend = '{}_{}'.format(buffUnits, buffDist)
+        buffAppend = '{}_{}'.format(buffDistReplace, buffUnits)
         # Output
         outputLocation = r'\\ccpasr34\psep$\GIS\SARA\PopEstimates.gdb\\'
         # Output appended text for clip
         #outputAppend = 'EstCensusPop_{}_{}'.format(pattsID, buffAppend)
-        outputAppend = 'EstCensusPop_{}_{}'.format(pattsID, fileCount)
+        outputAppend = 'EstCensusPop_{}_{}_{}'.format(pattsID, buffAppend, fileCount)
         # Boiler place text for ArcPy message
         # messageText = 'PATTS {} {}-{} risk radius'.format(pattsID, buffDist, buffUnits)
         messageText = 'PATTS {} risk radius #{}'.format(pattsID, fileCount)
