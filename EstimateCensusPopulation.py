@@ -35,7 +35,7 @@ try:
         feat = row.Shape
         # Will not have PATTS ID in layer if radius created from lat/long input
         # Have user enter name or PATTS ID
-        pattsID = arcpy.GetParameterAsText(1)
+        pattsID = row.PATTS
         # PATTS ID
         #pattsID = str(row.PATTS)
         # Buffer units
