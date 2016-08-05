@@ -41,45 +41,53 @@ schools = 'Education'
 arcpy.MakeFeatureLayer_management(schools, 'schools_lyr')
 
 try:
-    cursor = arcpy.SearchCursor(sara, fields="NAME; BUFFDIST; UNITS") # old cursor syntax
+    cursor = arcpy.SearchCursor(sara) # old cursor syntax
     fileCount = 0
     for row in cursor:
         fileCount += 1
+        # PATTS ID
+        pattsID = row.PATTS
+        # Buffer units
+        buffUnits = row.UNITS
+        # Buffer distance
+        buffDist = str(row.BUFFDIST)
+        # Replace . with _ in buffer distance
+        buffDistReplace = buffDist.replace('.', '_')
         # Assisted Living
         # Select Assisted Living sites that intersect SARA risk radius
         arcpy.SelectLayerByLocation_management('assistedLiving_lyr', 'INTERSECT', sara, "", 'NEW_SELECTION')
         # Export selected features to Excel
-        arcpy.TableToExcel_conversion('assistedLiving_lyr', outputFolder + r'\AssistedLiving_{0}_{1}_{2}_{3}.xls'.format(row.getValue('NAME'), row.getValue('BUFFDIST'), row.getValue('UNITS'), fileCount))
+        arcpy.TableToExcel_conversion('assistedLiving_lyr', outputFolder + r'\AssistedLiving_PATTS_{0}_{1}_{2}_{3}.xls'.format(pattsID, buffDistReplace, buffUnits, fileCount))
         # Add status message to ArcGIS dialog box
-        arcpy.AddMessage('Completed extracting to Excel the Assisted Living Facilities within the {0}-{1} risk radius for {2} SARA facility'.format(row.getValue('BUFFDIST'), row.getValue('UNITS'),row.getValue('NAME')))
+        arcpy.AddMessage('Completed extracting to Excel the Assisted Living Facilities within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
         # Daycares
         # Select Daycares sites that intersect SARA risk radius
         arcpy.SelectLayerByLocation_management('daycares_lyr', 'INTERSECT', sara, "", 'NEW_SELECTION')
         # Export selected features to Excel
-        arcpy.TableToExcel_conversion('daycares_lyr', outputFolder + r'\Daycares_{0}_{1}_{2}_{3}.xls'.format(row.getValue('NAME'), row.getValue('BUFFDIST'), row.getValue('UNITS'), fileCount))
+        arcpy.TableToExcel_conversion('daycares_lyr', outputFolder + r'\Daycares_PATTS_{0}_{1}_{2}_{3}.xls'.format(pattsID, buffDistReplace, buffUnits, fileCount))
         # Add status message to ArcGIS dialog box
-        arcpy.AddMessage('Completed extracting to Excel the Daycares within the {0}-{1} risk radius for {2} SARA facility'.format(row.getValue('BUFFDIST'), row.getValue('UNITS'),row.getValue('NAME')))
+        arcpy.AddMessage('Completed extracting to Excel the Daycares within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
         # Health Medical
         # Select Health Medical sites that intersect SARA risk radius
         arcpy.SelectLayerByLocation_management('medical_lyr', 'INTERSECT', sara, "", 'NEW_SELECTION')
         # Export selected features to Excel
-        arcpy.TableToExcel_conversion('medical_lyr', outputFolder + r'\MedicalSites_{0}_{1}_{2}_{3}.xls'.format(row.getValue('NAME'), row.getValue('BUFFDIST'), row.getValue('UNITS'), fileCount))
+        arcpy.TableToExcel_conversion('medical_lyr', outputFolder + r'\MedicalSites_PATTS_{0}_{1}_{2}_{3}.xls'.format(pattsID, buffDistReplace, buffUnits, fileCount))
         # Add status message to ArcGIS dialog box
-        arcpy.AddMessage('Completed extracting to Excel the Medical Facilities within the {0}-{1} risk radius for {2} SARA facility'.format(row.getValue('BUFFDIST'), row.getValue('UNITS'),row.getValue('NAME')))
+        arcpy.AddMessage('Completed extracting to Excel the Medical Facilities within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
         # MHIDD
         # Select MHIDD sites that intersect SARA risk radius
         arcpy.SelectLayerByLocation_management('mhIdd_lyr', 'INTERSECT', sara, "", 'NEW_SELECTION')
         # Export selected features to Excel
-        arcpy.TableToExcel_conversion('mhIdd_lyr', outputFolder + r'\MHIDD_{0}_{1}_{2}_{3}.xls'.format(row.getValue('NAME'), row.getValue('BUFFDIST'), row.getValue('UNITS'), fileCount))
+        arcpy.TableToExcel_conversion('mhIdd_lyr', outputFolder + r'\MHIDD_PATTS_{0}_{1}_{2}_{3}.xls'.format(pattsID, buffDistReplace, buffUnits, fileCount))
         # Add status message to ArcGIS dialog box
-        arcpy.AddMessage('Completed extracting to Excel the MHIDD Facilities within the {0}-{1} risk radius for {2} SARA facility'.format(row.getValue('BUFFDIST'), row.getValue('UNITS'),row.getValue('NAME')))
+        arcpy.AddMessage('Completed extracting to Excel the MHIDD Facilities within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
         # Schools
         # Select Schools sites that intersect SARA risk radius
         arcpy.SelectLayerByLocation_management('schools_lyr', 'INTERSECT', sara, "", 'NEW_SELECTION')
         # Export selected features to Excel
-        arcpy.TableToExcel_conversion('schools_lyr', outputFolder + r'\Schools_{0}_{1}_{2}_{3}.xls'.format(row.getValue('NAME'), row.getValue('BUFFDIST'), row.getValue('UNITS'), fileCount))
+        arcpy.TableToExcel_conversion('schools_lyr', outputFolder + r'\Schools_PATTS_{0}_{1}_{2}_{3}.xls'.format(pattsID, buffDistReplace, buffUnits, fileCount))
         # Add status message to ArcGIS dialog box
-        arcpy.AddMessage('Completed extracting to Excel the Schools within the {0}-{1} risk radius for {2} SARA facility'.format(row.getValue('BUFFDIST'), row.getValue('UNITS'),row.getValue('NAME')))
+        arcpy.AddMessage('Completed extracting to Excel the Schools within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
     del cursor, row
 
 except Exception:
