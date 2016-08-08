@@ -57,7 +57,7 @@ try:
         # Select Assisted Living sites that intersect SARA risk radius
         arcpy.SelectLayerByLocation_management('assistedLiving_lyr', 'INTERSECT', sara, "", 'NEW_SELECTION')
         # Test if any features are selected
-        matchCountAL = int(arcpy.GetCount_management('assistedLiving_lyr'))
+        matchCountAL = int(arcpy.GetCount_management('assistedLiving_lyr')[0])
         # If no features selected, add message indicating no features selected
         if matchCountAL == 0:
             arcpy.AddMessage('No Assisted Living Facilities located within within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
@@ -69,7 +69,7 @@ try:
         # Daycares
         # Select Daycares sites that intersect SARA risk radius
         arcpy.SelectLayerByLocation_management('daycares_lyr', 'INTERSECT', sara, "", 'NEW_SELECTION')
-        matchCountDaycares = int(arcpy.GetCount_management('daycares_lyr'))
+        matchCountDaycares = int(arcpy.GetCount_management('daycares_lyr')[0])
         # If no features selected, add message indicating no features selected
         if matchCountDaycares == 0:
             arcpy.AddMessage('No Daycares located within within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
@@ -82,7 +82,7 @@ try:
         # Select Health Medical sites that intersect SARA risk radius
         arcpy.SelectLayerByLocation_management('medical_lyr', 'INTERSECT', sara, "", 'NEW_SELECTION')
         # Test if any features are selected
-        matchCountMH = int(arcpy.GetCount_management('medical_lyr'))
+        matchCountMH = int(arcpy.GetCount_management('medical_lyr')[0])
         # If no features selected, add message indicating no features selected
         if matchCountMH == 0:
             arcpy.AddMessage('No Medical Facilities located within within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
@@ -95,7 +95,7 @@ try:
         # Select MHIDD sites that intersect SARA risk radius
         arcpy.SelectLayerByLocation_management('mhIdd_lyr', 'INTERSECT', sara, "", 'NEW_SELECTION')
         # Test if any features are selected
-        matchCountMHIDD = int(arcpy.GetCount_management('mhIdd_lyr'))
+        matchCountMHIDD = int(arcpy.GetCount_management('mhIdd_lyr')[0])
         # If no features selected, add message indicating no features selected
         if matchCountMHIDD == 0:
             arcpy.AddMessage('No MHIDD Facilities located within within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
@@ -108,7 +108,7 @@ try:
         # Select Schools sites that intersect SARA risk radius
         arcpy.SelectLayerByLocation_management('schools_lyr', 'INTERSECT', sara, "", 'NEW_SELECTION')
         # Test if any features are selected
-        matchCountSchools = int(arcpy.GetCount_management('schools_lyr'))
+        matchCountSchools = int(arcpy.GetCount_management('schools_lyr')[0])
         # If no features selected, add message indicating no features selected
         if matchCountSchools == 0:
             arcpy.AddMessage('No Schools located within within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
