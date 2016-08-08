@@ -108,9 +108,9 @@ try:
         # Select Schools sites that intersect SARA risk radius
         arcpy.SelectLayerByLocation_management('schools_lyr', 'INTERSECT', sara, "", 'NEW_SELECTION')
         # Test if any features are selected
-        matchCountySchools = int(arcpy.GetCount_management('schools_lyr'))
+        matchCountSchools = int(arcpy.GetCount_management('schools_lyr'))
         # If no features selected, add message indicating no features selected
-        if matchCountySchools == 0:
+        if matchCountSchools == 0:
             arcpy.AddMessage('No Schools located within within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
         else:
             # If features selected, export selected features to Excel
