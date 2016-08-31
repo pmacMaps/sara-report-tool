@@ -16,7 +16,7 @@
 def createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits):
 
     # access ArcPy module
-    import arcpy
+    import arcpy, sys
 
     # Variables for Project tool
     # WGS 1984
