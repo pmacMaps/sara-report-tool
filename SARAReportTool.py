@@ -22,9 +22,9 @@ import CreateSARARiskRadius
 
 # User entered variables from ArcGIS tool
 # latitude
-lat = arcpy.GetParameterAsText(0)
+lat = float(arcpy.GetParameterAsText(0))
 # longitude
-lon = arcpy.GetParameterAsText(1)
+lon = float(arcpy.GetParameterAsText(1))
 # PATTS ID
 pattsID = arcpy.GetParameterAsText(2)
 # Buffer distances
@@ -34,4 +34,4 @@ mrbUnits = arcpy.GetParameterAsText(4)
 # Output folder for Excel files
 outputFolder = arcpy.GetParameterAsText(5)
 
-CreateSARARiskRadius.createRiskRadii(lat,long,pattsID,mrbDistances,mrbUnits)
+mrbOutput = CreateSARARiskRadius.createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits)
