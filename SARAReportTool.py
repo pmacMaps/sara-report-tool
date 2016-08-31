@@ -17,7 +17,7 @@
 import arcpy
 
 # Import Create Risk Radius Tool
-import CreateSARARiskRadius
+import CreateSARARiskRadius, EstimateCensusPopulation
 
 
 # User entered variables from ArcGIS tool
@@ -34,4 +34,8 @@ mrbUnits = arcpy.GetParameterAsText(4)
 # Output folder for Excel files
 outputFolder = arcpy.GetParameterAsText(5)
 
+# Run multiple ring buffer (risk radii)
 mrbOutput = CreateSARARiskRadius.createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits)
+
+# Run census popluation estimate tool
+EstimateCensusPopulation.estimateCensusPopulation(mrbOutput)
