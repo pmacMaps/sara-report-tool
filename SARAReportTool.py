@@ -16,8 +16,8 @@
 # access ArcPy module
 import arcpy
 
-# Import Create Risk Radius Tool
-import CreateSARARiskRadius, EstimateCensusPopulation
+# Import component tools
+import CreateSARARiskRadius, EstimateCensusPopulation, VulnerableFacilitiesAnalysis
 
 
 # User entered variables from ArcGIS tool
@@ -39,3 +39,6 @@ mrbOutput = CreateSARARiskRadius.createRiskRadii(lat,lon,pattsID,mrbDistances,mr
 
 # Run census popluation estimate tool
 EstimateCensusPopulation.estimateCensusPopulation(mrbOutput)
+
+# Run vulnerable facilities analysis tool
+VulnerableFacilitiesAnalysis.vulnerableFacilitiesAnalysis(mrbOutput, outputFolder)
