@@ -17,7 +17,7 @@
 import arcpy
 
 # Import component tools
-import CreateSARARiskRadius, EstimateCensusPopulation, VulnerableFacilitiesAnalysis
+import riskRadius, populationEstimate, vulnerableFacilities
 
 
 # User entered variables from ArcGIS tool
@@ -35,10 +35,10 @@ mrbUnits = arcpy.GetParameterAsText(4)
 outputFolder = arcpy.GetParameterAsText(5)
 
 # Run multiple ring buffer (risk radii)
-mrbOutput = CreateSARARiskRadius.createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits)
+mrbOutput = riskRadius.createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits)
 
 # Run census popluation estimate tool
-EstimateCensusPopulation.estimateCensusPopulation(mrbOutput)
+populationEstimate.estimateCensusPopulation(mrbOutput)
 
 # Run vulnerable facilities analysis tool
-VulnerableFacilitiesAnalysis.vulnerableFacilitiesAnalysis(mrbOutput, outputFolder)
+vulnerableFacilities.vulnerableFacilitiesAnalysis(mrbOutput, outputFolder)
