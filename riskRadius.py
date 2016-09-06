@@ -1,17 +1,22 @@
-#----------------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------------------------------------------#
 # Name:        Create SARA Risk Radii
 #
-# Purpose:     Create risk radii for a user selected SARA facility
+# Ecosystem:   Used in SARAReportTool.py
 #
-# Summary:     User enters the latitude, longitude, and PATTS ID for the facility.  User also
-#              enters the distances and units for the risk radii.
+# Purpose:     Create risk radii for a user entered SARA facility.
+#
+# Summary:     Latitude, longitude, PATTS ID, risk-radius distances, and risk radius units
+#              are entered in the ArcGIS tool run from SARAReportTool.py
+#
+#              A geometry point is created from latitude and longitude and converted to PA State Plane South (ft) (SPC).
+#              The multi-ring buffer tool is run on the SPC point using the risk-radius distances and units.
 #
 # Author:      Patrick McKinney
 # Created:     07/26/2016
 # Updated:
 # Copyright:   (c) Cumberland County GIS 2016
 # Licence:     <your licence>
-#----------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------------------------------------#
 
 def createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits):
 
@@ -21,7 +26,7 @@ def createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits):
     # Variables for Project tool
     # WGS 1984
     srWGS84 = arcpy.SpatialReference(4326)
-        # PA State Plane South (feet) NAD 1983
+    # PA State Plane South (feet) NAD 1983
     srSPC = arcpy.SpatialReference(2272)
     # Output
     outputSPC = r'\\Ccpasr34\psep$\GIS\SARA\SitesLatLong.gdb\InputPoint_SPC_PATTS_{}'.format(pattsID)
