@@ -1,19 +1,35 @@
-#---------------------------------------------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------#
 # Name:        Vulnerable Facilities Analysis for Risk Radius
+#
+# Ecosystem:   Used in SARAReportTool.py
 #
 # Purpose:     Create an excel spreadsheet of vulnerable facilities located within risk radii.
 #              Vulnerable facilities include schools, daycares, medical facilities, assisted living centers, and MHIDD facilities
 #
-# Summary:     User selects a SARA risk radius layer.  For each record in that layer, a select by location analysis is run on each
-#              vulnerable facility.  The selected features are exported to an excel spreadsheet at a located defined by the user.#
-
+# Summary:     For each record in the SARA risk radii layer, a select by location analysis is run on each vulnerable facility.  The selected features are
+#              exported to an excel spreadsheet at a located defined by the user.
+#
+#              The SARA risk radii layer is created in a previous module wihtin SARAReportTool.py (riskRadius.py)
+#
 # Author:      Patrick McKinney
+#
 # Created:     04/28/2016
+#
+# Updated:     09/12/2016
+#
 # Copyright:   (c) Cumberland County GIS 2016
-# Licence:     <your licence>
-#----------------------------------------------------------------------------------------------------------------------------------#
+#
+# Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THESE MAPS OR DATA. THE MAPS AND DATA ARE PROVIDED WITHOUT
+#              WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+#              FITNESS FOR A PARTICULAR PURPOSE.
+#              Furthermore, Cumberland County assumes no liability for any errors, omissions, or inaccuracies in the information provided regardless
+#              of the cause of such, or for any decision made, action taken, or action not taken by the user in reliance upon any maps or data provided
+#              herein. The user assumes the risk that the information may not be accurate.
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 def vulnerableFacilitiesAnalysis(riskRadius, outputFolder):
+    """Select vulnerable facilities within risk radius"""
+    # Import modules
     import arcpy, sys
 
     # Vulnerable Facilities Sites
