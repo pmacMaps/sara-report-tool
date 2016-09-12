@@ -29,7 +29,6 @@
 
 def estimateCensusPopulation(riskRadius):
     """Calculate estimated population within each risk radius"""
-
     # Import modules
     import arcpy, sys
 
@@ -55,13 +54,13 @@ def estimateCensusPopulation(riskRadius):
             # Replace . with _ in buffer distance
             buffDistReplace = buffDist.replace('.', '_')
             # Buffer units and distance
-            buffAppend = '{}_{}'.format(buffDistReplace, buffUnits)
+            buffAppend = '{0}_{1}'.format(buffDistReplace, buffUnits)
             # Output
             outputLocation = r'\\ccpasr34\psep$\GIS\SARA\PopEstimates.gdb\\'
             # Output appended text for clip
-            outputAppend = 'EstCensusPop_PATTS_{}_{}_{}'.format(pattsID, buffAppend, fileCount)
+            outputAppend = 'EstCensusPop_PATTS_{0}_{1}_{2}'.format(pattsID, buffAppend, fileCount)
             # Boiler place text for ArcPy message
-            messageText = 'PATTS {} risk radius {}-{}'.format(pattsID, buffDist, buffUnits)
+            messageText = 'PATTS {0} risk radius {1}-{2}'.format(pattsID, buffDist, buffUnits)
             # Execute Clip tool
             newInput = arcpy.Clip_analysis(censusBlocks, feat, outputLocation + outputAppend)
             # Add message that Clip is completed
@@ -95,7 +94,7 @@ def estimateCensusPopulation(riskRadius):
             statsFields = [['ESTPOP', 'SUM']]
             arcpy.Statistics_analysis(newInput, outTable, statsFields)
             # Add message that estimated population sum table created
-            arcpy.AddMessage('Table of total estimated population created for PATTS {} risk radius {}-{}'.format(pattsID, buffDist, buffUnits))
+            arcpy.AddMessage('Table of total estimated population created for PATTS {0} risk radius {1}-{2}'.format(pattsID, buffDist, buffUnits))
         del cursor, row
     except Exception:
         e = sys.exc_info()[1]

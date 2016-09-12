@@ -50,7 +50,7 @@ def createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits):
 
         # Multi-ring Buffer tool
         # Output layer
-        mrbOutput = r'\\Ccpasr34\psep$\GIS\SARA\RiskRadii.gdb\RiskRadii_PATTS_{}'.format(pattsID)
+        mrbOutput = r'\\Ccpasr34\psep$\GIS\SARA\RiskRadii.gdb\RiskRadii_PATTS_{0}'.format(pattsID)
         # Field name in output layer to store buffer distance
         mrbDistanceField = 'BUFFDIST'
         # Dissolve option
@@ -58,7 +58,7 @@ def createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits):
         # Run tool
         arcpy.MultipleRingBuffer_analysis(outputSPC,mrbOutput,mrbDistances,mrbUnits,mrbDistanceField,mrbDissolveOption)
         # Add message that Multiple Ring Buffer tool complete
-        arcpy.AddMessage('SARA Risk Radii created for PATTS #{}'.format(pattsID))
+        arcpy.AddMessage('SARA Risk Radii created for PATTS #{0}'.format(pattsID))
         # Add field to output layer with PATTS ID
         fieldNamePatts = 'PATTS'
         fieldType = 'TEXT'
@@ -81,7 +81,7 @@ def createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits):
         # Calculate buffer distance units
         arcpy.CalculateField_management(mrbOutput, fieldNameUnits, fieldExpressionUnits, 'PYTHON_9.3')
         # Add message that buffer distance units added to Units field
-        arcpy.AddMessage('The units {} added to the UNITS field'.format(mrbUnits))
+        arcpy.AddMessage('The units {0} added to the UNITS field'.format(mrbUnits))
 
         # make sara risk radii layer available as input to other tools
         return mrbOutput
