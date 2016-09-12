@@ -1,4 +1,4 @@
-#----------------------------------------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------#
 # Name:        Create SARA Risk Radii
 #
 # Ecosystem:   Used in SARAReportTool.py
@@ -12,15 +12,24 @@
 #              The multi-ring buffer tool is run on the SPC point using the risk-radius distances and units.
 #
 # Author:      Patrick McKinney
+#
 # Created:     07/26/2016
-# Updated:
+#
+# Updated:     09/12/2016
+#
 # Copyright:   (c) Cumberland County GIS 2016
-# Licence:     <your licence>
-#---------------------------------------------------------------------------------------------------------------------------#
+#
+# Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THESE MAPS OR DATA. THE MAPS AND DATA ARE PROVIDED WITHOUT
+#              WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+#              FITNESS FOR A PARTICULAR PURPOSE.
+#              Furthermore, Cumberland County assumes no liability for any errors, omissions, or inaccuracies in the information provided regardless
+#              of the cause of such, or for any decision made, action taken, or action not taken by the user in reliance upon any maps or data provided
+#              herein. The user assumes the risk that the information may not be accurate.
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 def createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits):
-
-    # access ArcPy module
+    """Creates a multi-ring buffer for a SARA facility"""
+    # import modules
     import arcpy, sys
 
     # Variables for Project tool
@@ -49,7 +58,7 @@ def createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits):
         # Run tool
         arcpy.MultipleRingBuffer_analysis(outputSPC,mrbOutput,mrbDistances,mrbUnits,mrbDistanceField,mrbDissolveOption)
         # Add message that Multiple Ring Buffer tool complete
-        arcpy.AddMessage('SARA Risk Radii created')
+        arcpy.AddMessage('SARA Risk Radii created for PATTS #{}'.format(pattsID))
         # Add field to output layer with PATTS ID
         fieldNamePatts = 'PATTS'
         fieldType = 'TEXT'
@@ -61,7 +70,7 @@ def createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits):
         # Calculate PATTS ID to field
         arcpy.CalculateField_management(mrbOutput, fieldNamePatts, fieldExpressionPatts, 'PYTHON_9.3')
         # Add message that PATTS ID added to PATTS ID field
-        arcpy.AddMessage('PATTS ID added to PATTS ID field')
+        arcpy.AddMessage('PATTS ID #{} added to PATTS ID field'.format(pattsID))
         # Add field to output layer with buffer distance units
         fieldNameUnits = 'UNITS'
         fieldExpressionUnits = '"{0}"'.format(mrbUnits)
@@ -72,8 +81,9 @@ def createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits):
         # Calculate buffer distance units
         arcpy.CalculateField_management(mrbOutput, fieldNameUnits, fieldExpressionUnits, 'PYTHON_9.3')
         # Add message that buffer distance units added to Units field
-        arcpy.AddMessage('The units ' + mrbUnits + ' added to the UNITS field')
+        arcpy.AddMessage('The units {} added to the UNITS field'.format(mrbUnits))
 
+        # make sara risk radii layer available as input to other tools
         return mrbOutput
 
     except Exception:
