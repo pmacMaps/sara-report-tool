@@ -130,7 +130,6 @@ def vulnerableFacilitiesAnalysis(riskRadius, outputFolder):
                 # Add status message to ArcGIS dialog box
                 arcpy.AddMessage('Completed extracting to Excel the Schools within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
         del cursor, row
-
     except Exception:
         e = sys.exc_info()[1]
         arcpy.AddError(e.args[0])
