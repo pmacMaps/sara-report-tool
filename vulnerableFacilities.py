@@ -15,7 +15,7 @@
 #
 # Created:     04/28/2016
 #
-# Updated:     09/12/2016
+# Updated:     07/14/2017
 #
 # Copyright:   (c) Cumberland County GIS 2016
 #
@@ -27,10 +27,14 @@
 #              herein. The user assumes the risk that the information may not be accurate.
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
+# Import modules
+import arcpy, sys
+
 def vulnerableFacilitiesAnalysis(riskRadius, outputFolder):
     """Select vulnerable facilities within risk radius"""
-    # Import modules
-    import arcpy, sys
+
+    # allow data to be ovewritten
+    arcpy.env.overwriteOutput = True
 
     # Vulnerable Facilities Sites
     # Create Feature Layers for analysis

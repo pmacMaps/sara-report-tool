@@ -11,7 +11,7 @@
 # Author:      Patrick McKinney
 # Created:     08/10/2016
 #
-# Updated:     09/13/2016
+# Updated:     07/14/2017
 #
 # Copyright:   (c) Cumberland County GIS 2016
 #
@@ -23,12 +23,8 @@
 #              herein. The user assumes the risk that the information may not be accurate.
 #----------------------------------------------------------------------------------------------------------------------------------------------------------#
 
-# access ArcPy module
-import arcpy
-
-# Import component tools
-import riskRadius, populationEstimate, vulnerableFacilities
-
+# import modules
+import arcpy, riskRadius, populationEstimate, vulnerableFacilities
 
 # User entered variables from ArcGIS tool
 # latitude

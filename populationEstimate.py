@@ -15,7 +15,7 @@
 #
 # Created:     03/16/2016
 #
-# Updated:     09/12/2016
+# Updated:     07/14/2017
 #
 # Copyright:   (c) Cumberland County GIS 2016
 #
@@ -27,10 +27,14 @@
 #              herein. The user assumes the risk that the information may not be accurate.
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------#
 
+# Import modules
+import arcpy, sys
+
 def estimateCensusPopulation(riskRadius):
     """Calculate estimated population within each risk radius"""
-    # Import modules
-    import arcpy, sys
+
+    # allow data to be overwritten
+    arcpy.env.overwriteOutput = True
 
     # Regional U.S. Census Blocks - clipping feature
     censusBlocks = r'C:\GIS\Geodata.gdb\Regional_Census2010_Blocks_SPS'
