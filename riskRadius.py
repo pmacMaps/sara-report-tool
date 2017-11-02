@@ -90,6 +90,22 @@ def createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits):
         # make sara risk radii layer available as input to other tools
         return mrbOutput
 
-    except Exception:
-        e = sys.exc_info()[1]
-        arcpy.AddError(e.args[0])
+    # If an error occurs running geoprocessing tool(s) capture error and write message
+    # handle error outside of Python system
+    except EnvironmentError as e:
+        arcpy.AddError('\nAn error occured running this tool. Please provide the GIS Department the following error messages:')
+        # Store information about the error
+        tbE = sys.exc_info()[2]
+        # add the line number the error occured to the log message
+        arcpy.AddError('\nTool failed at Line {0} in {1}'.format(tbE.tb_lineno, sys.argv[0]))
+        # add the error message to the log message
+        arcpy.AddError('\nError: {0}'.format(str(e)))
+    # handle exception error
+    except Exception as e:
+        arcpy.AddError('\nAn error occured running this tool. Please provide the GIS Department the following error messages:')
+        # Store information about the error
+        tbE = sys.exc_info()[2]
+        # add the line number the error occured to the log message
+        arcpy.AddError('Tool failed at Line {0} in {1}'.format(tbE.tb_lineno, sys.argv[0]))
+        # add the error message to the log message
+        arcpy.AddError('\nError: {0}'.format(e.message))
