@@ -15,7 +15,7 @@
 #
 # Created:     04/28/2016
 #
-# Updated:     07/14/2017
+# Updated:     11/6/2017
 #
 # Copyright:   (c) Cumberland County GIS 2016
 #
@@ -28,112 +28,111 @@
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 # Import modules
-import arcpy, sys
+import arcpy, os, errorLogger
 
 def vulnerableFacilitiesAnalysis(riskRadius, outputFolder):
     """Select vulnerable facilities within risk radius"""
 
-    # allow data to be ovewritten
-    arcpy.env.overwriteOutput = True
+    # function to make feature layer
+    def makeFeatureLayer(featureClass,layerName):
+        """ Creates a feature layer. Assumes all feature classes within same workspace """
+        arcpy.MakeFeatureLayer_management(featureClass,layerName)
+    # end makeFeatureLayer
 
-    # Vulnerable Facilities Sites
-    # Create Feature Layers for analysis
-    # file geodatabase containing vulnerable facilities
-    arcpy.env.workspace = r'C:\GIS\Geodata.gdb'
-    # Assisted Living
-    assistedLiving = 'AssistedLiving'
-    arcpy.MakeFeatureLayer_management(assistedLiving, 'assistedLiving_lyr')
-    # Daycares
-    daycares = 'Daycare'
-    arcpy.MakeFeatureLayer_management(daycares, 'daycares_lyr')
-    # Health Medical Sites
-    medical = 'HealthMedical'
-    arcpy.MakeFeatureLayer_management(medical, 'medical_lyr')
-    # MHIDD Sites
-    mhIdd = 'MHIDD_Facility'
-    arcpy.MakeFeatureLayer_management(mhIdd, 'mhIdd_lyr')
-    # Schools
-    schools = 'Education'
-    arcpy.MakeFeatureLayer_management(schools, 'schools_lyr')
+    # function to select layers by location and export selected features to an excel spreadsheet
+    def selectFeaturesExportToExcel(featureLayer, intersectLayer, bufDist, bufUnits, patts, outLocation):
+        """ function to select layers by location and export selected features to an excel spreadsheet
+            featureLayer = the feature layer to select records from
+            intersectLayer = the layer to select the featureLayer against
+            bufDist = the field in the intersectLayer containing the buffer distances
+            bufUnits = the field in the intersectLayer containing the buffer units
+            patts = PATTS ID for SARA site
+            outLocation = the folder that output datasets are placed in.  This is a user parameter in  the tools' form
+        """
+        # select layer by location - intersect
+        arcpy.SelectLayerByLocation_management(featureLayer, 'INTERSECT', intersectLayer)
+        # get count of selected features
+        featuresCount = int(arcpy.GetCount_management(featureLayer)[0])
+        # if no features selected, add warning message
+        if featuresCount == 0:
+            # add warning message
+            arcpy.AddWarning('\nNo features from {} intersect the {}-{} buffer'.format(featureLayer,bufDist,bufUnits))
+        # if features are selected, export them to excel file
+        else:
+            # name for excel file
+            fileName = '{} Intersect {} {} {} Buffer.xls'.format(featureLayer,patts,bufDist,bufUnits)
+            # output file
+            outFile = os.path.join(outLocation,fileName)
+            # export to excel
+            arcpy.TableToExcel_conversion(featureLayer,outFile)
+            # add message
+            arcpy.AddMessage('\nExported features from {} layer that intersect the {}-{} buffer to a Microsoft Excel file'.format(featureLayer, bufDist, bufUnits))
+        # end if/else
+    # end function
 
     try:
-        cursor = arcpy.SearchCursor(riskRadius) # old cursor syntax
-        fileCount = 0
-        for row in cursor:
-            fileCount += 1
-            # PATTS ID
-            pattsID = row.PATTS
-            # Buffer units
-            buffUnits = row.UNITS
-            # Buffer distance
-            buffDist = str(row.BUFFDIST)
-            # Replace . with _ in buffer distance
-            buffDistReplace = buffDist.replace('.', '_')
-            # Assisted Living
-            # Select Assisted Living sites that intersect SARA risk radius
-            arcpy.SelectLayerByLocation_management('assistedLiving_lyr', 'INTERSECT', riskRadius, "", 'NEW_SELECTION')
-            # Test if any features are selected
-            matchCountAL = int(arcpy.GetCount_management('assistedLiving_lyr')[0])
-            # If no features selected, add message indicating no features selected
-            if matchCountAL == 0:
-                arcpy.AddMessage('No Assisted Living Facilities located within within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
+        # allow data to be ovewritten
+        arcpy.env.overwriteOutput = True
+        # file geodatabase containing vulnerable facilities
+        arcpy.env.workspace = r'C:\GIS\Geodata.gdb'
+        # add message
+        arcpy.AddMessage('\nPerforming Vulnerable Facilities analysis\nResults of analysis will be located at {}'.format(outputFolder))
+
+        # Vulnerable Facilities Sites
+        # Create Feature Layers for analysis
+        # Assisted Living
+        makeFeatureLayer('AssistedLiving','Assisted_Living')
+        # Daycares
+        makeFeatureLayer('Daycare','Daycares')
+        # Health Medical Sites
+        makeFeatureLayer('HealthMedical','Health_Medical')
+        # MHIDD Sites
+        makeFeatureLayer('MHIDD_Facility','MHIDD')
+        # Schools
+        makeFeatureLayer('Education','Schools')
+
+        # make feature layer for risk radii buffer to enable select by attribute
+        arcpy.MakeFeatureLayer_management(riskRadius, 'Buffer Layer')
+
+        # fields for cursor
+        riskRadiusFields = ['OBJECTID', 'PATTS', 'BUFFDIST', 'UNITS']
+        # create search cursor on feature layer
+        with arcpy.da.SearchCursor(riskRadius, riskRadiusFields) as cursor:
+            for row in cursor:
+                # where clause
+                whereClause = "OBJECTID = {}".format(row[0])
+                # select the current record from the buffer layer using OBJECTID
+                # this will set each select by location to be run against the current feature in the buffer layer
+                arcpy.SelectLayerByAttribute_management('Buffer Layer', 'NEW_SELECTION', whereClause)
+                # Assisted Living
+                selectFeaturesExportToExcel('Assisted_Living', 'Buffer Layer', row[2], row[3], row[1], outputFolder)
+                # Daycares
+                selectFeaturesExportToExcel('Daycares', 'Buffer Layer', row[2], row[3], row[1], outputFolder)
+                # Health Medical Sites
+                selectFeaturesExportToExcel('Health_Medical', 'Buffer Layer', row[2], row[3], row[1], outputFolder)
+                # MHIDD Sites
+                selectFeaturesExportToExcel('MHIDD', 'Buffer Layer', row[2], row[3], row[1], outputFolder)
+                # Schools
+                selectFeaturesExportToExcel('Schools', 'Buffer Layer', row[2], row[3], row[1], outputFolder)
+            # end for
+        # end with
+     # If an error occurs running geoprocessing tool(s) capture error and write message
+    # handle error outside of Python system
+    except EnvironmentError as e:
+        arcpy.AddError('\nAn error occured running this tool. Please provide the GIS Department the following error messages:')
+        # call error logger method
+        errorLogger.PrintException(e)
+    # handle exception error
+    except Exception as e:
+        arcpy.AddError('\nAn error occured running this tool. Please provide the GIS Department the following error messages:')
+        # call error logger method
+        errorLogger.PrintException(e)
+    # delete cursor
+    finally:
+        try:
+            if cursor:
+                del cursor
             else:
-                # If features selected, export selected features to Excel
-                arcpy.TableToExcel_conversion('assistedLiving_lyr', outputFolder + r'\AssistedLiving_PATTS_{0}_{1}_{2}_{3}.xls'.format(pattsID, buffDistReplace, buffUnits, fileCount))
-                # Add status message to ArcGIS dialog box
-                arcpy.AddMessage('Completed extracting to Excel the Assisted Living Facilities within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
-            # Daycares
-            # Select Daycares sites that intersect SARA risk radius
-            arcpy.SelectLayerByLocation_management('daycares_lyr', 'INTERSECT', riskRadius, "", 'NEW_SELECTION')
-            matchCountDaycares = int(arcpy.GetCount_management('daycares_lyr')[0])
-            # If no features selected, add message indicating no features selected
-            if matchCountDaycares == 0:
-                arcpy.AddMessage('No Daycares located within within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
-            else:
-                # If features selected, export selected features to Excel
-                arcpy.TableToExcel_conversion('daycares_lyr', outputFolder + r'\Daycares_PATTS_{0}_{1}_{2}_{3}.xls'.format(pattsID, buffDistReplace, buffUnits, fileCount))
-                # Add status message to ArcGIS dialog box
-                arcpy.AddMessage('Completed extracting to Excel the Daycares within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
-            # Health Medical
-            # Select Health Medical sites that intersect SARA risk radius
-            arcpy.SelectLayerByLocation_management('medical_lyr', 'INTERSECT', riskRadius, "", 'NEW_SELECTION')
-            # Test if any features are selected
-            matchCountMH = int(arcpy.GetCount_management('medical_lyr')[0])
-            # If no features selected, add message indicating no features selected
-            if matchCountMH == 0:
-                arcpy.AddMessage('No Medical Facilities located within within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
-            else:
-                # If features selected, export selected features to Excel
-                arcpy.TableToExcel_conversion('medical_lyr', outputFolder + r'\MedicalSites_PATTS_{0}_{1}_{2}_{3}.xls'.format(pattsID, buffDistReplace, buffUnits, fileCount))
-                # Add status message to ArcGIS dialog box
-                arcpy.AddMessage('Completed extracting to Excel the Medical Facilities within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
-            # MHIDD
-            # Select MHIDD sites that intersect SARA risk radius
-            arcpy.SelectLayerByLocation_management('mhIdd_lyr', 'INTERSECT', riskRadius, "", 'NEW_SELECTION')
-            # Test if any features are selected
-            matchCountMHIDD = int(arcpy.GetCount_management('mhIdd_lyr')[0])
-            # If no features selected, add message indicating no features selected
-            if matchCountMHIDD == 0:
-                arcpy.AddMessage('No MHIDD Facilities located within within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
-            else:
-                # If features selected, export selected features to Excel
-                arcpy.TableToExcel_conversion('mhIdd_lyr', outputFolder + r'\MHIDD_PATTS_{0}_{1}_{2}_{3}.xls'.format(pattsID, buffDistReplace, buffUnits, fileCount))
-                # Add status message to ArcGIS dialog box
-                arcpy.AddMessage('Completed extracting to Excel the MHIDD Facilities within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
-            # Schools
-            # Select Schools sites that intersect SARA risk radius
-            arcpy.SelectLayerByLocation_management('schools_lyr', 'INTERSECT', riskRadius, "", 'NEW_SELECTION')
-            # Test if any features are selected
-            matchCountSchools = int(arcpy.GetCount_management('schools_lyr')[0])
-            # If no features selected, add message indicating no features selected
-            if matchCountSchools == 0:
-                arcpy.AddMessage('No Schools located within within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
-            else:
-                # If features selected, export selected features to Excel
-                arcpy.TableToExcel_conversion('schools_lyr', outputFolder + r'\Schools_PATTS_{0}_{1}_{2}_{3}.xls'.format(pattsID, buffDistReplace, buffUnits, fileCount))
-                # Add status message to ArcGIS dialog box
-                arcpy.AddMessage('Completed extracting to Excel the Schools within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
-        del cursor, row
-    except Exception:
-        e = sys.exc_info()[1]
-        arcpy.AddError(e.args[0])
+                pass
+        except:
+            pass
