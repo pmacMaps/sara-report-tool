@@ -15,9 +15,9 @@
 #
 # Created:     04/28/2016
 #
-# Updated:     11/6/2017
+# Updated:     02/21/2019
 #
-# Copyright:   (c) Cumberland County GIS 2016
+# Copyright:   (c) Cumberland County GIS 2019
 #
 # Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THESE MAPS OR DATA. THE MAPS AND DATA ARE PROVIDED WITHOUT
 #              WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
@@ -30,7 +30,7 @@
 # Import modules
 import arcpy, os, errorLogger
 
-def vulnerableFacilitiesAnalysis(riskRadius, outputFolder):
+def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
     """Select vulnerable facilities within risk radius"""
 
     # function to make feature layer
@@ -62,7 +62,7 @@ def vulnerableFacilitiesAnalysis(riskRadius, outputFolder):
             # name for excel file
             fileName = '{} Intersect {} {} {} Buffer.xls'.format(featureLayer,patts,bufDist,bufUnits)
             # output file
-            outFile = os.path.join(outLocation,fileName)
+            outFile = os.path.join(output_dir,fileName)
             # export to excel
             arcpy.TableToExcel_conversion(featureLayer,outFile)
             # add message
@@ -71,6 +71,7 @@ def vulnerableFacilitiesAnalysis(riskRadius, outputFolder):
     # end function
 
     try:
+
         # allow data to be ovewritten
         arcpy.env.overwriteOutput = True
         # file geodatabase containing vulnerable facilities
@@ -105,15 +106,15 @@ def vulnerableFacilitiesAnalysis(riskRadius, outputFolder):
                 # this will set each select by location to be run against the current feature in the buffer layer
                 arcpy.SelectLayerByAttribute_management('Buffer Layer', 'NEW_SELECTION', whereClause)
                 # Assisted Living
-                selectFeaturesExportToExcel('Assisted_Living', 'Buffer Layer', row[2], row[3], row[1], outputFolder)
+                selectFeaturesExportToExcel('Assisted_Living', 'Buffer Layer', row[2], row[3], row[1], output_dir)
                 # Daycares
-                selectFeaturesExportToExcel('Daycares', 'Buffer Layer', row[2], row[3], row[1], outputFolder)
+                selectFeaturesExportToExcel('Daycares', 'Buffer Layer', row[2], row[3], row[1], output_dir)
                 # Health Medical Sites
-                selectFeaturesExportToExcel('Health_Medical', 'Buffer Layer', row[2], row[3], row[1], outputFolder)
+                selectFeaturesExportToExcel('Health_Medical', 'Buffer Layer', row[2], row[3], row[1], output_dir)
                 # MHIDD Sites
-                selectFeaturesExportToExcel('MHIDD', 'Buffer Layer', row[2], row[3], row[1], outputFolder)
+                selectFeaturesExportToExcel('MHIDD', 'Buffer Layer', row[2], row[3], row[1], output_dir)
                 # Schools
-                selectFeaturesExportToExcel('Schools', 'Buffer Layer', row[2], row[3], row[1], outputFolder)
+                selectFeaturesExportToExcel('Schools', 'Buffer Layer', row[2], row[3], row[1], output_dir)
             # end for
         # end with
      # If an error occurs running geoprocessing tool(s) capture error and write message
