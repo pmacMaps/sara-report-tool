@@ -15,9 +15,9 @@
 #
 # Created:     03/16/2016
 #
-# Updated:     07/14/2017
+# Updated:     2/21/2019
 #
-# Copyright:   (c) Cumberland County GIS 2016
+# Copyright:   (c) Cumberland County GIS 2019
 #
 # Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THESE MAPS OR DATA. THE MAPS AND DATA ARE PROVIDED WITHOUT
 #              WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
@@ -28,78 +28,92 @@
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 # Import modules
-import arcpy, sys
+import arcpy, sys, os
 
-def estimateCensusPopulation(riskRadius):
+def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb):
     """Calculate estimated population within each risk radius"""
-
-    # allow data to be overwritten
-    arcpy.env.overwriteOutput = True
-
-    # Regional U.S. Census Blocks - clipping feature
-    censusBlocks = r'C:\GIS\Geodata.gdb\Regional_Census2010_Blocks_SPS'
-
-    # Search cursor for SARA Facility Risk Radii
-    cursor = arcpy.SearchCursor(riskRadius)
     try:
-        fileCount = 0
-        # Loop through records of SARA Facility
-        for row in cursor:
-            fileCount += 1
-            # Clip US Census Blocks layer by SARA Facility record
-            # Clip feature
-            feat = row.Shape
-             # PATTS ID
-            pattsID = row.PATTS
-            # Buffer units
-            buffUnits = row.UNITS
-            # Buffer distance
-            buffDist = str(row.BUFFDIST)
-            # Replace . with _ in buffer distance
-            buffDistReplace = buffDist.replace('.', '_')
-            # Buffer units and distance
-            buffAppend = '{0}_{1}'.format(buffDistReplace, buffUnits)
-            # Output
-            outputLocation = r'\\ccpasr34\psep$\GIS\SARA\PopEstimates.gdb\\'
-            # Output appended text for clip
-            outputAppend = 'EstCensusPop_PATTS_{0}_{1}_{2}'.format(pattsID, buffAppend, fileCount)
-            # Boiler place text for ArcPy message
-            messageText = 'PATTS {0} risk radius {1}-{2}'.format(pattsID, buffDist, buffUnits)
-            # Execute Clip tool
-            newInput = arcpy.Clip_analysis(censusBlocks, feat, outputLocation + outputAppend)
-            # Add message that Clip is completed
-            arcpy.AddMessage('Census Blocks clipped for ' + messageText)
-            # Add field to hold clip area to original area ratio
-            areaRatioFieldName = 'AREARATIO'
-            areaRatioFieldType = 'DOUBLE'
-            # Execut Add Field tool
-            arcpy.AddField_management(newInput, areaRatioFieldName, areaRatioFieldType)
-            # Add message that Area Ratio Field has been added
-            arcpy.AddMessage('Area Ratio field added for ' + messageText)
-            # Add field to hold estimated population
-            estPopFieldName = 'ESTPOP'
-            estPopFieldType = 'LONG'
-            # Execut Add Field tool
-            arcpy.AddField_management(newInput, estPopFieldName, estPopFieldType)
-            # Add message that Estimated Population Field has been added
-            arcpy.AddMessage('Estimated Population field added for ' + messageText)
-            # Calculate the new area to old area ratio for each Census Block
-            areaRatioFieldExpression = '!Shape_Area! / !ORAREA!'
-            arcpy.CalculateField_management(newInput, 'AREARATIO', areaRatioFieldExpression, 'PYTHON_9.3')
-            # Add message that Area Ratio has been calculated
-            arcpy.AddMessage('New area to original area ratio calculated for ' + messageText)
-            # Calculate the estimated population in each census block based upon the area ratio
-            estimatedPopulationFieldExpression = '!POP10! * !AREARATIO!'
-            arcpy.CalculateField_management(newInput, 'ESTPOP', estimatedPopulationFieldExpression, 'PYTHON_9.3')
-            # Add message that Estimated Population has been calculated
-            arcpy.AddMessage('Estimated population calculated for ' + messageText)
-            # Calculate the total assumed population and export to dBASE table
-            outTable = outputLocation + outputAppend + '_SumPop'
-            statsFields = [['ESTPOP', 'SUM']]
-            arcpy.Statistics_analysis(newInput, outTable, statsFields)
-            # Add message that estimated population sum table created
-            arcpy.AddMessage('Table of total estimated population created for PATTS {0} risk radius {1}-{2}'.format(pattsID, buffDist, buffUnits))
-        del cursor, row
-    except Exception:
-        e = sys.exc_info()[1]
-        arcpy.AddError(e.args[0])
+        # allow data to be overwritten
+        arcpy.env.overwriteOutput = True
+        # Regional U.S. Census Blocks - clipping feature
+        census_blocks = r'C:\GIS\Geodata.gdb\Regional_Census2010_Blocks_SPS'
+        # create a text file in output location
+        population_text_file = r'{}\Estimated_Population_Within_Risk_Radii_PATTS_{}.txt'.format(output_dir,patts_id)
+        # placeholder for contents of text file storing estimate population
+        text_file_contents = ''
+
+        # fields for risk radius layer
+        riskRadiusFields = ['Shape', 'PATTS', 'BUFFDIST', 'UNITS']
+        # Search cursor for SARA Facility Risk Radii
+        with arcpy.da.SearchCursor(riskRadius, riskRadiusFields) as cursor:
+            for row in cursor:
+                # Replace . with _ in buffer distance
+                buffer_distance_replace = str(row[2]).replace('.', '_')
+                # Buffer units and distance
+                buffer_append_units = '{}_{}'.format(buffer_distance_replace, row[3])
+                # layer name for results of clip
+                output_layer_name = 'Estimated_Census_Population_PATTS_{}_{}'.format(row[1], buffer_append_units)
+                # Boiler place text for ArcPy message
+                message_text = 'PATTS {} risk radius {}-{}'.format(row[1], row[2], row[3])
+                # Clip US Census Blocks layer by SARA Facility record
+                clip_output_layer = arcpy.Clip_analysis(census_blocks, row[0], os.path.join(output_gdb, output_layer_name))
+                # Add message that Clip is completed
+                arcpy.AddMessage('Census Blocks clipped for {}'.format(message_text))
+                # Add field to hold clip area to original area ratio
+                area_ratio_field_name = 'AREARATIO'
+                area_ratio_field_type = 'DOUBLE'
+                # Execut Add Field tool
+                arcpy.AddField_management(clip_output_layer, area_ratio_field_name, area_ratio_field_type)
+                # Add message that Area Ratio Field has been added
+                arcpy.AddMessage('Area Ratio field added for {}'.format(message_text))
+                # Add field to hold estimated population
+                est_pop_field_name = 'ESTPOP'
+                est_pop_field_type = 'LONG'
+                # Execut Add Field tool
+                arcpy.AddField_management(clip_output_layer, est_pop_field_name, est_pop_field_type)
+                # Add message that Estimated Population Field has been added
+                arcpy.AddMessage('Estimated Population field added for {}'.format(message_text))
+                # Calculate the new area to old area ratio for each Census Block
+                area_ratio_field_expression = '!Shape_Area! / !ORAREA!'
+                arcpy.CalculateField_management(clip_output_layer, 'AREARATIO', area_ratio_field_expression, 'PYTHON_9.3')
+                # Add message that Area Ratio has been calculated
+                arcpy.AddMessage('New area to original area ratio calculated for {}'.format(message_text))
+                # Calculate the estimated population in each census block based upon the area ratio
+                estimated_population_feld_expression = '!POP10! * !AREARATIO!'
+                arcpy.CalculateField_management(clip_output_layer, 'ESTPOP', estimated_population_feld_expression, 'PYTHON_9.3')
+                # Add message that Estimated Population has been calculated
+                arcpy.AddMessage('Estimated population calculated for {}'.format(message_text))
+                # Calculate the total assumed population and export to dBASE table
+                out_table = os.path.join(output_gdb, '{}_Sum_Population'.format(output_layer_name))
+                stats_fields = [['ESTPOP', 'SUM']]
+                arcpy.Statistics_analysis(clip_output_layer, out_table, stats_fields)
+                # write sum population in text file
+                # Add message that estimated population sum table created
+                arcpy.AddMessage('Table of total estimated population created for PATTS {} risk radius {}-{}'.format(row[1], row[2], row[3]))
+            # end for
+        # end cursor
+    # If an error occurs running geoprocessing tool(s) capture error and write message
+    # handle error outside of Python system
+    except EnvironmentError as e:
+        arcpy.AddError('\nAn error occured running this tool. Please provide the GIS Department the following error messages:')
+        # Store information about the error
+        tbE = sys.exc_info()[2]
+        # add the line number the error occured to the log message
+        arcpy.AddError('\nTool failed at Line {} in {}'.format(tbE.tb_lineno, sys.argv[0]))
+        # add the error message to the log message
+        arcpy.AddError('\nError: {}'.format(str(e)))
+    # handle exception error
+    except Exception as e:
+        arcpy.AddError('\nAn error occured running this tool. Please provide the GIS Department the following error messages:')
+        # Store information about the error
+        tbE = sys.exc_info()[2]
+        # add the line number the error occured to the log message
+        arcpy.AddError('Tool failed at Line {} in {}'.format(tbE.tb_lineno, sys.argv[0]))
+        # add the error message to the log message
+        arcpy.AddError('\nError: {}'.format(e.message))
+    finally:
+        try:
+            if cursor:
+                del cursor
+        except:
+            pass

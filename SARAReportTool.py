@@ -11,9 +11,9 @@
 # Author:      Patrick McKinney
 # Created:     08/10/2016
 #
-# Updated:     07/14/2017
+# Updated:     02/14/2019
 #
-# Copyright:   (c) Cumberland County GIS 2016
+# Copyright:   (c) Cumberland County GIS 2019
 #
 # Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THESE MAPS OR DATA. THE MAPS AND DATA ARE PROVIDED WITHOUT
 #              WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
@@ -24,27 +24,39 @@
 #----------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 # import modules
-import arcpy, riskRadius, populationEstimate, vulnerableFacilities
+import arcpy, os, riskRadius, populationEstimate, vulnerableFacilities
 
-# User entered variables from ArcGIS tool
-# latitude
-lat = float(arcpy.GetParameterAsText(0))
-# longitude
-lon = float(arcpy.GetParameterAsText(1))
-# PATTS ID
-pattsID = arcpy.GetParameterAsText(2)
-# Buffer distances
-mrbDistances = arcpy.GetParameterAsText(3)
-# Buffer units - will typically be miles or feet
-mrbUnits = arcpy.GetParameterAsText(4)
-# Output folder for Excel files
-outputFolder = arcpy.GetParameterAsText(5)
+try:
+    # User entered variables from ArcGIS tool
+    # latitude
+    lat = float(arcpy.GetParameterAsText(0))
+    # longitude
+    lon = float(arcpy.GetParameterAsText(1))
+    # PATTS ID
+    patts_id = arcpy.GetParameterAsText(2)
+    # Buffer distances
+    mrb_distances = arcpy.GetParameterAsText(3)
+    # Buffer units - will typically be miles or feet
+    mrb_units = arcpy.GetParameterAsText(4)
+    # Output directory for analysis reslts
+    output_dir = arcpy.GetParameterAsText(5)
+    # out file geodatabase nam
+    output_gdb_name = 'Analysis_Results_PATTS_{}'.format(patts_id)
+    # output file geodatabase
+    output_gdb = os.path.join(output_dir,output_gdb_name)
 
-# Run multiple ring buffer (risk radii)
-mrbOutput = riskRadius.createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits)
+    # create project file geodatabase
+    arcpy.CreateFileGDB_management(output_dir, output_gdb_name, '10.0')
+    # add message to user
+    arcpy.AddMessage('\nCreated project file geodatabase {} in {}\n'.format(output_gdb_name, output_dir))
 
-# Run census popluation estimate tool
-populationEstimate.estimateCensusPopulation(mrbOutput)
+    # Run multiple ring buffer (risk radii)
+    risk_radii_output = riskRadius.createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,output_gdb)
 
-# Run vulnerable facilities analysis tool
-vulnerableFacilities.vulnerableFacilitiesAnalysis(mrbOutput, outputFolder)
+    # Run census popluation estimate tool
+    populationEstimate.estimateCensusPopulation(risk_radii_output, patts_id, output_dir, output_gdb)
+
+    # Run vulnerable facilities analysis tool
+    vulnerableFacilities.vulnerableFacilitiesAnalysis(risk_radii_output, output_dir)
+except:
+    pass

@@ -3,7 +3,7 @@
 #
 # Ecosystem:   Used in SARAReportTool.py
 #
-# Purpose:     Create risk radii for a user entered SARA facility.
+# Purpose:     Create risk radii (multi-ring buffer) for a user entered SARA facility.
 #
 # Summary:     Latitude, longitude, PATTS ID, risk-radius distances, and risk radius units
 #              are entered in the ArcGIS tool run from SARAReportTool.py
@@ -15,7 +15,7 @@
 #
 # Created:     07/26/2016
 #
-# Updated:     07/14/2017
+# Updated:     02/21/2019
 #
 # Copyright:   (c) Cumberland County GIS 2016
 #
@@ -28,67 +28,67 @@
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 # import modules
-import arcpy, sys
+import arcpy, sys, os
 
-def createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits):
+def createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,out_gbd):
     """Creates a multi-ring buffer for a SARA facility"""
-
-    # allow data to be ovewritten
-    arcpy.env.overwriteOutput = True
-
-    # Variables for Project tool
-    # WGS 1984
-    srWGS84 = arcpy.SpatialReference(4326)
-    # PA State Plane South (feet) NAD 1983
-    srSPC = arcpy.SpatialReference(2272)
-    # Output
-    outputSPC = r'\\Ccpasr34\psep$\GIS\SARA\SitesLatLong.gdb\InputPoint_SPC_PATTS_{}'.format(pattsID)
-
     try:
+        # allow data to be ovewritten
+        arcpy.env.overwriteOutput = True
+        # Variables for Project tool
+        # WGS 1984 geographic coordinate system
+        sr_wgs_84 = arcpy.SpatialReference(4326)
+        # PA State Plane South (feet) NAD 1983 projected coordinate system
+        sr_spc = arcpy.SpatialReference(2272)
+        # reprojected point output name
+        output_spc_name = 'Input_Point_SPC_PATTS_{}'.format(patts_id)
+        # output layer
+        output_spc = os.path.join(out_gbd,output_spc_name)
+
         # create point from user entered latitude and longitude
         point = arcpy.Point(lon, lat)
         # create geometry point for use in buffer tool - WGS 1984
-        geometryPoint = arcpy.PointGeometry(point, srWGS84)
+        geometry_point = arcpy.PointGeometry(point, sr_wgs_84)
         # Convert WGS 1984 layer to a NAD 1983 PA State Plane South layer
-        arcpy.Project_management(geometryPoint, outputSPC, srSPC, "NAD_1983_To_WGS_1984_1", preserve_shape = "PRESERVE_SHAPE")
+        arcpy.Project_management(geometry_point, output_spc, sr_spc, "NAD_1983_To_WGS_1984_1", preserve_shape = "PRESERVE_SHAPE")
 
         # Multi-ring Buffer tool
         # Output layer
-        mrbOutput = r'\\Ccpasr34\psep$\GIS\SARA\RiskRadii.gdb\RiskRadii_PATTS_{0}'.format(pattsID)
+        mrb_output = os.path.join(out_gbd, 'RiskRadii_PATTS_{}'.format(patts_id))
         # Field name in output layer to store buffer distance
-        mrbDistanceField = 'BUFFDIST'
+        mrb_distance_field = 'BUFFDIST'
         # Dissolve option
-        mrbDissolveOption = 'NONE'
+        mrb_dissolve_option = 'NONE'
         # Run tool
-        arcpy.MultipleRingBuffer_analysis(outputSPC,mrbOutput,mrbDistances,mrbUnits,mrbDistanceField,mrbDissolveOption)
+        arcpy.MultipleRingBuffer_analysis(output_spc,mrb_output,mrb_distances,mrb_units,mrb_distance_field,mrb_dissolve_option)
         # Add message that Multiple Ring Buffer tool complete
-        arcpy.AddMessage('SARA Risk Radii created for PATTS #{0}'.format(pattsID))
+        arcpy.AddMessage('SARA Risk Radii created for PATTS #{}'.format(patts_id))
         # Add field to output layer with PATTS ID
-        fieldNamePatts = 'PATTS'
-        fieldType = 'TEXT'
-        fieldExpressionPatts = '"{0}"'.format(pattsID)
+        field_name_patts = 'PATTS'
+        field_type = 'TEXT'
+        field_expression_patts = '"{0}"'.format(patts_id)
         # Execut Add Field Management tool
-        arcpy.AddField_management(mrbOutput,fieldNamePatts,fieldType)
+        arcpy.AddField_management(mrb_output,field_name_patts,field_type)
         # Add message that PATTS ID added to layer
         arcpy.AddMessage('PATTS ID field added')
         # Calculate PATTS ID to field
-        arcpy.CalculateField_management(mrbOutput, fieldNamePatts, fieldExpressionPatts, 'PYTHON_9.3')
+        arcpy.CalculateField_management(mrb_output, field_name_patts, field_expression_patts, 'PYTHON_9.3')
         # Add message that PATTS ID added to PATTS ID field
-        arcpy.AddMessage('PATTS ID #{} added to PATTS ID field'.format(pattsID))
+        arcpy.AddMessage('PATTS ID #{} added to PATTS ID field'.format(patts_id))
         # Add field to output layer with buffer distance units
-        fieldNameUnits = 'UNITS'
-        fieldExpressionUnits = '"{0}"'.format(mrbUnits)
+        field_name_units = 'UNITS'
+        field_expression_units = '"{}"'.format(mrb_units)
         # Execut Add Field Management tool
-        arcpy.AddField_management(mrbOutput, fieldNameUnits,fieldType)
+        arcpy.AddField_management(mrb_output,field_name_units,field_type)
         # Add message that Units field added to layer
         arcpy.AddMessage('UNITS field added')
         # Calculate buffer distance units
-        arcpy.CalculateField_management(mrbOutput, fieldNameUnits, fieldExpressionUnits, 'PYTHON_9.3')
+        arcpy.CalculateField_management(mrb_output, field_name_units, field_expression_units, 'PYTHON_9.3')
         # Add message that buffer distance units added to Units field
-        arcpy.AddMessage('The units {0} added to the UNITS field'.format(mrbUnits))
+        arcpy.AddMessage('The units {} added to the UNITS field'.format(mrb_units))
 
         # make sara risk radii layer available as input to other tools
-        return mrbOutput
+        return mrb_output
 
     # If an error occurs running geoprocessing tool(s) capture error and write message
     # handle error outside of Python system
@@ -97,15 +97,15 @@ def createRiskRadii(lat,lon,pattsID,mrbDistances,mrbUnits):
         # Store information about the error
         tbE = sys.exc_info()[2]
         # add the line number the error occured to the log message
-        arcpy.AddError('\nTool failed at Line {0} in {1}'.format(tbE.tb_lineno, sys.argv[0]))
+        arcpy.AddError('\nTool failed at Line {} in {}'.format(tbE.tb_lineno, sys.argv[0]))
         # add the error message to the log message
-        arcpy.AddError('\nError: {0}'.format(str(e)))
+        arcpy.AddError('\nError: {}'.format(str(e)))
     # handle exception error
     except Exception as e:
         arcpy.AddError('\nAn error occured running this tool. Please provide the GIS Department the following error messages:')
         # Store information about the error
         tbE = sys.exc_info()[2]
         # add the line number the error occured to the log message
-        arcpy.AddError('Tool failed at Line {0} in {1}'.format(tbE.tb_lineno, sys.argv[0]))
+        arcpy.AddError('Tool failed at Line {} in {}'.format(tbE.tb_lineno, sys.argv[0]))
         # add the error message to the log message
-        arcpy.AddError('\nError: {0}'.format(e.message))
+        arcpy.AddError('\nError: {}'.format(e.message))

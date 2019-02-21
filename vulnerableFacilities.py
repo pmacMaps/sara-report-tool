@@ -15,9 +15,9 @@
 #
 # Created:     04/28/2016
 #
-# Updated:     07/14/2017
+# Updated:     02/21/2019
 #
-# Copyright:   (c) Cumberland County GIS 2016
+# Copyright:   (c) Cumberland County GIS 2019
 #
 # Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THESE MAPS OR DATA. THE MAPS AND DATA ARE PROVIDED WITHOUT
 #              WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
@@ -28,47 +28,40 @@
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 # Import modules
-import arcpy, sys
+import arcpy, sys, os
 
-def vulnerableFacilitiesAnalysis(riskRadius, outputFolder):
-    """Select vulnerable facilities within risk radius"""
-
-    # allow data to be ovewritten
-    arcpy.env.overwriteOutput = True
-
-    # Vulnerable Facilities Sites
-    # Create Feature Layers for analysis
-    # file geodatabase containing vulnerable facilities
-    arcpy.env.workspace = r'C:\GIS\Geodata.gdb'
-    # Assisted Living
-    assistedLiving = 'AssistedLiving'
-    arcpy.MakeFeatureLayer_management(assistedLiving, 'assistedLiving_lyr')
-    # Daycares
-    daycares = 'Daycare'
-    arcpy.MakeFeatureLayer_management(daycares, 'daycares_lyr')
-    # Health Medical Sites
-    medical = 'HealthMedical'
-    arcpy.MakeFeatureLayer_management(medical, 'medical_lyr')
-    # MHIDD Sites
-    mhIdd = 'MHIDD_Facility'
-    arcpy.MakeFeatureLayer_management(mhIdd, 'mhIdd_lyr')
-    # Schools
-    schools = 'Education'
-    arcpy.MakeFeatureLayer_management(schools, 'schools_lyr')
-
+def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
     try:
-        cursor = arcpy.SearchCursor(riskRadius) # old cursor syntax
-        fileCount = 0
-        for row in cursor:
-            fileCount += 1
-            # PATTS ID
-            pattsID = row.PATTS
-            # Buffer units
-            buffUnits = row.UNITS
-            # Buffer distance
-            buffDist = str(row.BUFFDIST)
-            # Replace . with _ in buffer distance
-            buffDistReplace = buffDist.replace('.', '_')
+        """Select vulnerable facilities within risk radius"""
+        # allow data to be ovewritten
+        arcpy.env.overwriteOutput = True
+        # Vulnerable Facilities Sites
+        # Create Feature Layers for analysis
+        # file geodatabase containing vulnerable facilities
+        arcpy.env.workspace = r'C:\GIS\Geodata.gdb'
+        # Assisted Living
+        assistedLiving = 'AssistedLiving'
+        arcpy.MakeFeatureLayer_management(assistedLiving, 'assistedLiving_lyr')
+        # Daycares
+        daycares = 'Daycare'
+        arcpy.MakeFeatureLayer_management(daycares, 'daycares_lyr')
+        # Health Medical Sites
+        medical = 'HealthMedical'
+        arcpy.MakeFeatureLayer_management(medical, 'medical_lyr')
+        # MHIDD Sites
+        mhIdd = 'MHIDD_Facility'
+        arcpy.MakeFeatureLayer_management(mhIdd, 'mhIdd_lyr')
+        # Schools
+        schools = 'Education'
+        arcpy.MakeFeatureLayer_management(schools, 'schools_lyr')
+
+         # fields for risk radius layer
+        riskRadiusFields = ['Shape', 'PATTS', 'BUFFDIST', 'UNITS']
+        # Search cursor for SARA Facility Risk Radii
+        with arcpy.da.SearchCursor(riskRadius, riskRadiusFields) as cursor:
+            for row in cursor:
+             # Replace . with _ in buffer distance
+             buffer_distance_replace = str(row[2]).replace('.', '_')
             # Assisted Living
             # Select Assisted Living sites that intersect SARA risk radius
             arcpy.SelectLayerByLocation_management('assistedLiving_lyr', 'INTERSECT', riskRadius, "", 'NEW_SELECTION')
@@ -133,7 +126,28 @@ def vulnerableFacilitiesAnalysis(riskRadius, outputFolder):
                 arcpy.TableToExcel_conversion('schools_lyr', outputFolder + r'\Schools_PATTS_{0}_{1}_{2}_{3}.xls'.format(pattsID, buffDistReplace, buffUnits, fileCount))
                 # Add status message to ArcGIS dialog box
                 arcpy.AddMessage('Completed extracting to Excel the Schools within the {0}-{1} risk radius for SARA facility PATTS {2}'.format(buffDist, buffUnits, pattsID))
-        del cursor, row
-    except Exception:
-        e = sys.exc_info()[1]
-        arcpy.AddError(e.args[0])
+    # If an error occurs running geoprocessing tool(s) capture error and write message
+    # handle error outside of Python system
+    except EnvironmentError as e:
+        arcpy.AddError('\nAn error occured running this tool. Please provide the GIS Department the following error messages:')
+        # Store information about the error
+        tbE = sys.exc_info()[2]
+        # add the line number the error occured to the log message
+        arcpy.AddError('\nTool failed at Line {} in {}'.format(tbE.tb_lineno, sys.argv[0]))
+        # add the error message to the log message
+        arcpy.AddError('\nError: {}'.format(str(e)))
+    # handle exception error
+    except Exception as e:
+        arcpy.AddError('\nAn error occured running this tool. Please provide the GIS Department the following error messages:')
+        # Store information about the error
+        tbE = sys.exc_info()[2]
+        # add the line number the error occured to the log message
+        arcpy.AddError('Tool failed at Line {} in {}'.format(tbE.tb_lineno, sys.argv[0]))
+        # add the error message to the log message
+        arcpy.AddError('\nError: {}'.format(e.message))
+    finally:
+        try:
+            if cursor:
+                del cursor
+        except:
+            pass
