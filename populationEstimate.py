@@ -28,7 +28,7 @@
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 # Import modules
-import arcpy, sys, os
+import arcpy, os, errorLogger
 
 def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb):
     """Calculate estimated population within each risk radius"""
@@ -96,21 +96,13 @@ def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb):
     # handle error outside of Python system
     except EnvironmentError as e:
         arcpy.AddError('\nAn error occured running this tool. Please provide the GIS Department the following error messages:')
-        # Store information about the error
-        tbE = sys.exc_info()[2]
-        # add the line number the error occured to the log message
-        arcpy.AddError('\nTool failed at Line {} in {}'.format(tbE.tb_lineno, sys.argv[0]))
-        # add the error message to the log message
-        arcpy.AddError('\nError: {}'.format(str(e)))
+        # call error logger method
+        errorLogger.PrintException(e)
     # handle exception error
     except Exception as e:
         arcpy.AddError('\nAn error occured running this tool. Please provide the GIS Department the following error messages:')
-        # Store information about the error
-        tbE = sys.exc_info()[2]
-        # add the line number the error occured to the log message
-        arcpy.AddError('Tool failed at Line {} in {}'.format(tbE.tb_lineno, sys.argv[0]))
-        # add the error message to the log message
-        arcpy.AddError('\nError: {}'.format(e.message))
+        # call error logger method
+        errorLogger.PrintException(e)
     finally:
         try:
             if cursor:

@@ -117,7 +117,7 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
                 selectFeaturesExportToExcel('Schools', 'Buffer Layer', row[2], row[3], row[1], output_dir)
             # end for
         # end with
-     # If an error occurs running geoprocessing tool(s) capture error and write message
+    # If an error occurs running geoprocessing tool(s) capture error and write message
     # handle error outside of Python system
     except EnvironmentError as e:
         arcpy.AddError('\nAn error occured running this tool. Please provide the GIS Department the following error messages:')
