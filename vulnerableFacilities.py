@@ -15,7 +15,7 @@
 #
 # Created:     04/28/2016
 #
-# Updated:     02/21/2019
+# Updated:     02/22/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
@@ -36,7 +36,7 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
     # function to make feature layer
     def makeFeatureLayer(featureClass,layerName):
         """ Creates a feature layer. Assumes all feature classes within same workspace """
-        arcpy.MakeFeatureLayer_management(featureClass,layerName)
+        arcpy.MakeFeatureLayer_management(featureClass,layerName, where_clause="")
     # end makeFeatureLayer
 
     # function to select layers by location and export selected features to an excel spreadsheet
@@ -91,7 +91,7 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
         # Daycares
         makeFeatureLayer('EOC_Daycare','Daycares')
         # Health Medical Sites
-        makeFeatureLayer('Site_HealthMedical','Health_Medical')
+        makeFeatureLayer('Site_HealthMedical','Health_Medical', """FCode <> 'Pharmacy'""")
         # MHIDD Sites
         makeFeatureLayer('EOC_MHIDD_Facility','MHIDD')
         # Schools
@@ -100,6 +100,10 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
         makeFeatureLayer('EOC_SARA', 'SARA')
         # Hydrography (NHD)
         makeFeatureLayer('NHD_Streams', 'Streams')
+        # Municipalities
+        makeFeatureLayer('Pennsylvania_Municipalities', 'Municipality')
+        # Counties
+        makeFeatureLayer('Pennsylvania_Counties', 'County')
         # Water Filtration Plants
         # makeFeatureLayer('', 'Water_Plants')
         # Natural Gas Facilities
@@ -132,6 +136,10 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
                 selectFeaturesExportToExcel('SARA', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
                 # Hydrography
                 selectFeaturesExportToExcel('Streams', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
+                # Municipalities
+                selectFeaturesExportToExcel('Municipality', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
+                # Counties
+                selectFeaturesExportToExcel('County', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
                 # Water Filtration Plants
                 # selectFeaturesExportToExcel('Water_Plants', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
                 # Natural Gas Facilities
