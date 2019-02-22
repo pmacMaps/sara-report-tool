@@ -87,15 +87,23 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
         # Vulnerable Facilities Sites
         # Create Feature Layers for analysis
         # Assisted Living
-        makeFeatureLayer('AssistedLiving','Assisted_Living')
+        makeFeatureLayer('EOC_AssistedLiving','Assisted_Living')
         # Daycares
-        makeFeatureLayer('Daycare','Daycares')
+        makeFeatureLayer('EOC_Daycare','Daycares')
         # Health Medical Sites
-        makeFeatureLayer('HealthMedical','Health_Medical')
+        makeFeatureLayer('Site_HealthMedical','Health_Medical')
         # MHIDD Sites
-        makeFeatureLayer('MHIDD_Facility','MHIDD')
+        makeFeatureLayer('EOC_MHIDD_Facility','MHIDD')
         # Schools
-        makeFeatureLayer('Education','Schools')
+        makeFeatureLayer('Site_Education','Schools')
+        # SARA Facilities
+        makeFeatureLayer('EOC_SARA', 'SARA')
+        # Hydrography (NHD)
+        makeFeatureLayer('NHD_Streams', 'Streams')
+        # Water Filtration Plants
+        # makeFeatureLayer('', 'Water_Plants')
+        # Natural Gas Facilities
+        # makeFeatureLayer('', 'Natural_Gas')
 
         # make feature layer for risk radii buffer to enable select by attribute
         arcpy.MakeFeatureLayer_management(riskRadius, 'Buffer Layer')
@@ -120,6 +128,14 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
                 selectFeaturesExportToExcel('MHIDD', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
                 # Schools
                 selectFeaturesExportToExcel('Schools', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
+                # SARA
+                selectFeaturesExportToExcel('SARA', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
+                # Hydrography
+                selectFeaturesExportToExcel('Streams', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
+                # Water Filtration Plants
+                # selectFeaturesExportToExcel('Water_Plants', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
+                # Natural Gas Facilities
+                # selectFeaturesExportToExcel('Natural_Gas', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
             # end for
         # end with
     # If an error occurs running geoprocessing tool(s) capture error and write message
