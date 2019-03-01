@@ -30,15 +30,13 @@
 # Import modules
 import arcpy, os, errorLogger
 
-def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb):
+def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb, results_text_file):
     """Calculate estimated population within each risk radius"""
     try:
         # allow data to be overwritten
         arcpy.env.overwriteOutput = True
         # Regional U.S. Census Blocks - clipping feature
         census_blocks = r'C:\GIS\Geodata.gdb\Regional_Census2010_Blocks_SPS'
-        # create a text file in output location
-        population_text_file = r'{}\Estimated_Population_Within_Risk_Radii_PATTS_{}.txt'.format(output_dir,patts_id)
         # placeholder for contents of text file storing estimate population
         text_file_contents = ''
 

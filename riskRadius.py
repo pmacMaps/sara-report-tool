@@ -15,9 +15,9 @@
 #
 # Created:     07/26/2016
 #
-# Updated:     02/21/2019
+# Updated:     03/01/2019
 #
-# Copyright:   (c) Cumberland County GIS 2016
+# Copyright:   (c) Cumberland County GIS 2019
 #
 # Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THESE MAPS OR DATA. THE MAPS AND DATA ARE PROVIDED WITHOUT
 #              WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
@@ -28,9 +28,9 @@
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 # import modules
-import arcpy, os, errorLogger
+import arcpy, os, errorLogger, floodplainAnalysis
 
-def createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,out_gbd):
+def createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,out_gbd,text_file):
     """Creates a multi-ring buffer for a SARA facility"""
     try:
         # allow data to be ovewritten
@@ -86,6 +86,9 @@ def createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,out_gbd):
         arcpy.CalculateField_management(mrb_output, field_name_units, field_expression_units, 'PYTHON_9.3')
         # Add message that buffer distance units added to Units field
         arcpy.AddMessage('The units {} added to the UNITS field'.format(mrb_units))
+
+        # run floodplain analysis module
+        floodplainAnalysis.intersectFloodplainTest(output_spc,lon,lat,text_file)
 
         # make sara risk radii layer available as input to other tools
         return mrb_output

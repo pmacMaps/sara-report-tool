@@ -44,6 +44,8 @@ try:
     output_gdb_name = 'Analysis_Results_PATTS_{}'.format(patts_id)
     # output file geodatabase
     output_gdb = os.path.join(output_dir,output_gdb_name)
+    # create a text file in output location
+    results_text_file = r'{}\SARA_Analysis_Results_PATTS_{}.txt'.format(output_dir,patts_id)
 
     # create project file geodatabase
     arcpy.CreateFileGDB_management(output_dir, output_gdb_name, '10.0')
@@ -51,10 +53,10 @@ try:
     arcpy.AddMessage('\nCreated project file geodatabase {} in {}\n'.format(output_gdb_name, output_dir))
 
     # Run multiple ring buffer (risk radii)
-    risk_radii_output = riskRadius.createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,output_gdb)
+    risk_radii_output = riskRadius.createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,output_gdb,results_text_file)
 
     # Run census popluation estimate tool
-    populationEstimate.estimateCensusPopulation(risk_radii_output, patts_id, output_dir, output_gdb)
+    populationEstimate.estimateCensusPopulation(risk_radii_output, patts_id, output_dir, output_gdb, results_text_file)
 
     # Run vulnerable facilities analysis tool
     vulnerableFacilities.vulnerableFacilitiesAnalysis(risk_radii_output, output_dir)
