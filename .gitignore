@@ -1,7 +1,8 @@
 excel/
 old/
-SARA_Tool_DEV.gdb/
+Reference/
 Testing Scripts/
-SARA Report Tool Issues.xlsx
+SARA_Tool_DEV.gdb/
 PopEstimates.gdb/
 *.pyc
+SARA Report Tool Issues.xlsx
