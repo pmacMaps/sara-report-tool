@@ -11,7 +11,7 @@
 # Author:      Patrick McKinney
 # Created:     08/10/2016
 #
-# Updated:     02/14/2019
+# Updated:     03/11/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
@@ -24,21 +24,21 @@
 #----------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 # import modules
-import arcpy, os, riskRadius, populationEstimate, vulnerableFacilities
+import arcpy, os, riskRadius, populationEstimate, vulnerableFacilities, errorLogger
 
 try:
     # User entered variables from ArcGIS tool
-    # latitude
+    # latitude - double
     lat = float(arcpy.GetParameterAsText(0))
-    # longitude
+    # longitude - double
     lon = float(arcpy.GetParameterAsText(1))
-    # PATTS ID
+    # PATTS ID - string
     patts_id = arcpy.GetParameterAsText(2)
-    # Buffer distances
+    # Buffer distances - double, multi-value
     mrb_distances = arcpy.GetParameterAsText(3)
-    # Buffer units - will typically be miles or feet
+    # Buffer units - string, drop-down list
     mrb_units = arcpy.GetParameterAsText(4)
-    # Output directory for analysis reslts
+    # Output directory for analysis reslts - folder
     output_dir = arcpy.GetParameterAsText(5)
     # out file geodatabase nam
     output_gdb_name = 'Analysis_Results_PATTS_{}'.format(patts_id)
@@ -60,5 +60,14 @@ try:
 
     # Run vulnerable facilities analysis tool
     vulnerableFacilities.vulnerableFacilitiesAnalysis(risk_radii_output, output_dir)
-except:
-    pass
+# If an error occurs running geoprocessing tool(s) capture error and write message
+# handle error outside of Python system
+except EnvironmentError as e:
+    arcpy.AddError('\nAn error occured running this tool. Please provide the GIS Department the following error messages:')
+    # call error logger method
+    errorLogger.PrintException(e)
+# handle exception error
+except Exception as e:
+    arcpy.AddError('\nAn error occured running this tool. Please provide the GIS Department the following error messages:')
+    # call error logger method
+    errorLogger.PrintException(e)

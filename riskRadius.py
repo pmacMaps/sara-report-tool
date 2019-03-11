@@ -15,7 +15,7 @@
 #
 # Created:     07/26/2016
 #
-# Updated:     03/01/2019
+# Updated:     03/11/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
@@ -62,30 +62,31 @@ def createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,out_gbd,text_file):
         # Run tool
         arcpy.MultipleRingBuffer_analysis(output_spc,mrb_output,mrb_distances,mrb_units,mrb_distance_field,mrb_dissolve_option)
         # Add message that Multiple Ring Buffer tool complete
-        arcpy.AddMessage('SARA Risk Radii created for PATTS #{}'.format(patts_id))
+        arcpy.AddMessage('\nSARA Risk Radii created for PATTS #{}\n'.format(patts_id))
         # Add field to output layer with PATTS ID
         field_name_patts = 'PATTS'
         field_type = 'TEXT'
-        field_expression_patts = '"{0}"'.format(patts_id)
+        field_expression_patts = '"{}"'.format(patts_id)
         # Execut Add Field Management tool
         arcpy.AddField_management(mrb_output,field_name_patts,field_type)
         # Add message that PATTS ID added to layer
-        arcpy.AddMessage('PATTS ID field added')
+        arcpy.AddMessage('\nPATTS ID field added\n')
         # Calculate PATTS ID to field
         arcpy.CalculateField_management(mrb_output, field_name_patts, field_expression_patts, 'PYTHON_9.3')
         # Add message that PATTS ID added to PATTS ID field
-        arcpy.AddMessage('PATTS ID #{} added to PATTS ID field'.format(patts_id))
+        arcpy.AddMessage('\nPATTS ID #{} added to PATTS ID field\n'.format(patts_id))
         # Add field to output layer with buffer distance units
         field_name_units = 'UNITS'
         field_expression_units = '"{}"'.format(mrb_units)
         # Execut Add Field Management tool
         arcpy.AddField_management(mrb_output,field_name_units,field_type)
         # Add message that Units field added to layer
-        arcpy.AddMessage('UNITS field added')
+        arcpy.AddMessage('\nUNITS field added\n')
         # Calculate buffer distance units
         arcpy.CalculateField_management(mrb_output, field_name_units, field_expression_units, 'PYTHON_9.3')
         # Add message that buffer distance units added to Units field
-        arcpy.AddMessage('The units {} added to the UNITS field'.format(mrb_units))
+        arcpy.AddMessage('\nThe units {} added to the UNITS field\n'.format(mrb_units))
+        arcpy.AddMessage('\nPerforming analysist to see if SARA facility is within a floodplain\n')
 
         # run floodplain analysis module
         floodplainAnalysis.intersectFloodplainTest(output_spc,lon,lat,text_file)
