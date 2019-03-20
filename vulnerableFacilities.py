@@ -15,7 +15,7 @@
 #
 # Created:     04/28/2016
 #
-# Updated:     02/22/2019
+# Updated:     03/20/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
@@ -107,7 +107,7 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
         # Water Filtration Plants
         # makeFeatureLayer('', 'Water_Plants')
         # Natural Gas Facilities
-        # makeFeatureLayer('', 'Natural_Gas')
+        makeFeatureLayer('NPMS_Pipelines', 'Natural_Gas')
 
         # make feature layer for risk radii buffer to enable select by attribute
         arcpy.MakeFeatureLayer_management(riskRadius, 'Buffer Layer')
@@ -143,7 +143,7 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
                 # Water Filtration Plants
                 # selectFeaturesExportToExcel('Water_Plants', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
                 # Natural Gas Facilities
-                # selectFeaturesExportToExcel('Natural_Gas', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
+                selectFeaturesExportToExcel('Natural_Gas', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
             # end for
         # end with
     # If an error occurs running geoprocessing tool(s) capture error and write message
