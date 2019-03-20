@@ -57,7 +57,7 @@ def intersectFloodplainTest(projected_point,lon,lat,results_text_file):
             arcpy.AddWarning('\nNo Building Footprints contain the SARA Site located at latitude: {}; longitude: {}'.format(lat,lon))
         # if a building footprint is selected, test if it intersects a floodplain
         else:
-            arcpy.SelectLayerByLocation_management('Building_Footprints', 'INTERSECT', 'FEMA_Floodplains_2009', selection_type='SUBSET_SELECTION')
+            arcpy.SelectLayerByLocation_management('Building_Footprints', 'INTERSECT', 'Floodplains', selection_type='SUBSET_SELECTION')
             # get count of selected features
             features_count = int(arcpy.GetCount_management('Building_Footprints')[0])
             # if no features selected, add warning message

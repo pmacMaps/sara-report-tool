@@ -34,9 +34,9 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
     """Select vulnerable facilities within risk radius"""
 
     # function to make feature layer
-    def makeFeatureLayer(featureClass,layerName):
+    def makeFeatureLayer(featureClass,layerName, clause=""):
         """ Creates a feature layer. Assumes all feature classes within same workspace """
-        arcpy.MakeFeatureLayer_management(featureClass,layerName, where_clause="")
+        arcpy.MakeFeatureLayer_management(featureClass,layerName, where_clause=clause)
     # end makeFeatureLayer
 
     # function to select layers by location and export selected features to an excel spreadsheet
@@ -91,7 +91,7 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
         # Daycares
         makeFeatureLayer('EOC_Daycare','Daycares')
         # Health Medical Sites
-        makeFeatureLayer('Site_HealthMedical','Health_Medical', """FCode <> 'Pharmacy'""")
+        makeFeatureLayer('Site_HealthMedical','Health_Medical', """FCode <> 80026""")
         # MHIDD Sites
         makeFeatureLayer('EOC_MHIDD_Facility','MHIDD')
         # Schools

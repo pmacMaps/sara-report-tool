@@ -86,7 +86,7 @@ def createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,out_gbd,text_file):
         arcpy.CalculateField_management(mrb_output, field_name_units, field_expression_units, 'PYTHON_9.3')
         # Add message that buffer distance units added to Units field
         arcpy.AddMessage('\nThe units {} added to the UNITS field'.format(mrb_units))
-        arcpy.AddMessage('\nPerforming analysist to see if SARA facility is within a floodplain')
+        arcpy.AddMessage('\nPerforming analysis to see if SARA facility is within a floodplain')
 
         # run floodplain analysis module
         floodplainAnalysis.intersectFloodplainTest(output_spc,lon,lat,text_file)
