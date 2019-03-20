@@ -43,14 +43,14 @@ try:
     # out file geodatabase nam
     output_gdb_name = 'Analysis_Results_PATTS_{}'.format(patts_id)
     # output file geodatabase
-    output_gdb = os.path.join(output_dir,output_gdb_name)
+    output_gdb = '{}.gdb'.format(os.path.join(output_dir,output_gdb_name))
     # create a text file in output location
     results_text_file = r'{}\SARA_Analysis_Results_PATTS_{}.txt'.format(output_dir,patts_id)
 
     # create project file geodatabase
     arcpy.CreateFileGDB_management(output_dir, output_gdb_name, '10.0')
     # add message to user
-    arcpy.AddMessage('\nCreated project file geodatabase {} in {}\n'.format(output_gdb_name, output_dir))
+    arcpy.AddMessage('\nCreated project file geodatabase {} in {}'.format(output_gdb_name, output_dir))
 
     # Run multiple ring buffer (risk radii)
     risk_radii_output = riskRadius.createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,output_gdb,results_text_file)

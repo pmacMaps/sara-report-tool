@@ -54,40 +54,40 @@ def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb, resul
                 # Boiler place text for ArcPy message
                 message_text = 'PATTS {} risk radius {}-{}'.format(row[1], row[2], row[3])
                 # Clip US Census Blocks layer by SARA Facility record
-                clip_output_layer = arcpy.Clip_analysis(census_blocks, row[0], os.path.join(output_gdb, output_layer_name))
+                clip_output_layer = arcpy.Clip_analysis(census_blocks, riskRadius, os.path.join(output_gdb, output_layer_name))
                 # Add message that Clip is completed
-                arcpy.AddMessage('Census Blocks clipped for {}'.format(message_text))
+                arcpy.AddMessage('\nCensus Blocks clipped for {}'.format(message_text))
                 # Add field to hold clip area to original area ratio
                 area_ratio_field_name = 'AREARATIO'
                 area_ratio_field_type = 'DOUBLE'
                 # Execut Add Field tool
                 arcpy.AddField_management(clip_output_layer, area_ratio_field_name, area_ratio_field_type)
                 # Add message that Area Ratio Field has been added
-                arcpy.AddMessage('Area Ratio field added for {}'.format(message_text))
+                arcpy.AddMessage('\nArea Ratio field added for {}'.format(message_text))
                 # Add field to hold estimated population
                 est_pop_field_name = 'ESTPOP'
                 est_pop_field_type = 'LONG'
                 # Execut Add Field tool
                 arcpy.AddField_management(clip_output_layer, est_pop_field_name, est_pop_field_type)
                 # Add message that Estimated Population Field has been added
-                arcpy.AddMessage('Estimated Population field added for {}'.format(message_text))
+                arcpy.AddMessage('\nEstimated Population field added for {}'.format(message_text))
                 # Calculate the new area to old area ratio for each Census Block
                 area_ratio_field_expression = '!Shape_Area! / !ORAREA!'
                 arcpy.CalculateField_management(clip_output_layer, 'AREARATIO', area_ratio_field_expression, 'PYTHON_9.3')
                 # Add message that Area Ratio has been calculated
-                arcpy.AddMessage('New area to original area ratio calculated for {}'.format(message_text))
+                arcpy.AddMessage('\nNew area to original area ratio calculated for {}'.format(message_text))
                 # Calculate the estimated population in each census block based upon the area ratio
                 estimated_population_feld_expression = '!POP10! * !AREARATIO!'
                 arcpy.CalculateField_management(clip_output_layer, 'ESTPOP', estimated_population_feld_expression, 'PYTHON_9.3')
                 # Add message that Estimated Population has been calculated
-                arcpy.AddMessage('Estimated population calculated for {}'.format(message_text))
+                arcpy.AddMessage('\nEstimated population calculated for {}'.format(message_text))
                 # Calculate the total assumed population and export to dBASE table
                 out_table = os.path.join(output_gdb, '{}_Sum_Population'.format(output_layer_name))
                 stats_fields = [['ESTPOP', 'SUM']]
                 arcpy.Statistics_analysis(clip_output_layer, out_table, stats_fields)
                 # write sum population in text file
                 # Add message that estimated population sum table created
-                arcpy.AddMessage('Table of total estimated population created for PATTS {} risk radius {}-{}'.format(row[1], row[2], row[3]))
+                arcpy.AddMessage('\nTable of total estimated population created for PATTS {} risk radius {}-{}'.format(row[1], row[2], row[3]))
             # end for
         # end cursor
     # If an error occurs running geoprocessing tool(s) capture error and write message
