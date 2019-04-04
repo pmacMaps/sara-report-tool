@@ -15,7 +15,7 @@
 #
 # Created:     03/16/2016
 #
-# Updated:     2/21/2019
+# Updated:     4/4/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
@@ -29,6 +29,14 @@
 
 # Import modules
 import arcpy, os, errorLogger
+
+def updateProportionalValues(field_name, field_type, layer, message, calc_field):
+    """add fields and calculate values for those created fields"""
+    arcpy.AddField_management(layer, field_name, field_type)
+    arcpy.AddMessage('\nAdded field "{}" for {}'.format(field_name,message))
+    field_expression = '!{}! * !AREARATIO!'.format(calc_field)
+    arcpy.CalculateField_management(layer, field_name, field_expression, 'PYTHON_9.3')
+    arcpy.AddMessage('\nCompleted field calculation for field "{}"'.format(calc_field))
 
 def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb, results_text_file):
     """Calculate estimated population within each risk radius"""
@@ -64,23 +72,15 @@ def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb, resul
                 arcpy.AddField_management(clip_output_layer, area_ratio_field_name, area_ratio_field_type)
                 # Add message that Area Ratio Field has been added
                 arcpy.AddMessage('\nArea Ratio field added for {}'.format(message_text))
-                # Add field to hold estimated population
-                est_pop_field_name = 'ESTPOP'
-                est_pop_field_type = 'LONG'
-                # Execut Add Field tool
-                arcpy.AddField_management(clip_output_layer, est_pop_field_name, est_pop_field_type)
-                # Add message that Estimated Population Field has been added
-                arcpy.AddMessage('\nEstimated Population field added for {}'.format(message_text))
                 # Calculate the new area to old area ratio for each Census Block
                 area_ratio_field_expression = '!Shape_Area! / !ORAREA!'
                 arcpy.CalculateField_management(clip_output_layer, 'AREARATIO', area_ratio_field_expression, 'PYTHON_9.3')
                 # Add message that Area Ratio has been calculated
                 arcpy.AddMessage('\nNew area to original area ratio calculated for {}'.format(message_text))
-                # Calculate the estimated population in each census block based upon the area ratio
-                estimated_population_feld_expression = '!POP10! * !AREARATIO!'
-                arcpy.CalculateField_management(clip_output_layer, 'ESTPOP', estimated_population_feld_expression, 'PYTHON_9.3')
-                # Add message that Estimated Population has been calculated
-                arcpy.AddMessage('\nEstimated population calculated for {}'.format(message_text))
+                # Add field for Estimated Population and calculate value
+                updateProportionalValues('ESTPOP', 'LONG', clip_output_layer, message_text, 'POP10')
+                # Add field for Estimated Households and calculate value
+                updateProportionalValues('ESTHOUSEHOLDS', 'LONG', clip_output_layer, message_text, 'HOUSING10')
                 # Calculate the total assumed population and export to dBASE table
                 out_table = os.path.join(output_gdb, '{}_Sum_Population'.format(output_layer_name))
                 stats_fields = [['ESTPOP', 'SUM']]
