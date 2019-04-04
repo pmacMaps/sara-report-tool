@@ -38,6 +38,14 @@ def updateProportionalValues(field_name, field_type, layer, message, calc_field)
     arcpy.CalculateField_management(layer, field_name, field_expression, 'PYTHON_9.3')
     arcpy.AddMessage('\nCompleted field calculation for field "{}"'.format(calc_field))
 
+def createSummaryTable(table_name, summary_field, layer, message):
+    """Create a summary table for a provided layer and field"""
+    out_table = os.path.join(output_gdb, '{}_{}'.format(output_layer_name, table_name))
+    stats_fields = [[summary_field, 'SUM']]
+    arcpy.Statistics_analysis(layer, out_table, stats_fields)
+    arcpy.AddMessage('\nCreated summary table for field "{}" for {}'.format(summary_field, patts_id))
+    return out_table
+
 def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb, results_text_file):
     """Calculate estimated population within each risk radius"""
     try:
@@ -81,13 +89,13 @@ def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb, resul
                 updateProportionalValues('ESTPOP', 'LONG', clip_output_layer, message_text, 'POP10')
                 # Add field for Estimated Households and calculate value
                 updateProportionalValues('ESTHOUSEHOLDS', 'LONG', clip_output_layer, message_text, 'HOUSING10')
-                # Calculate the total assumed population and export to dBASE table
-                out_table = os.path.join(output_gdb, '{}_Sum_Population'.format(output_layer_name))
-                stats_fields = [['ESTPOP', 'SUM']]
-                arcpy.Statistics_analysis(clip_output_layer, out_table, stats_fields)
-                # write sum population in text file
-                # Add message that estimated population sum table created
-                arcpy.AddMessage('\nTable of total estimated population created for PATTS {} risk radius {}-{}'.format(row[1], row[2], row[3]))
+                # create summary table for Estimated Population
+                est_pop_table = createSummaryTable('Sum_Population', 'ESTPOP', clip_output_layer, message_text)
+                # create summary table for Estimated Housholds
+                est_households_table = createSummaryTable('Sum_Households', 'ESTHOUSEHOLDS' , clip_output_layer, message_text)
+
+                # get values in tables and write to text file
+
             # end for
         # end cursor
     # If an error occurs running geoprocessing tool(s) capture error and write message
