@@ -56,11 +56,18 @@ def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb, resul
         # placeholder for contents of text file storing estimate population
         text_file_contents = ''
 
+        # make feature layer for risk radii buffer to enable select by attribute
+        arcpy.MakeFeatureLayer_management(riskRadius, 'Buffer Layer')
         # fields for risk radius layer
-        riskRadiusFields = ['Shape', 'PATTS', 'BUFFDIST', 'UNITS']
+        riskRadiusFields = ['OBJECTID', 'PATTS', 'BUFFDIST', 'UNITS']
         # Search cursor for SARA Facility Risk Radii
         with arcpy.da.SearchCursor(riskRadius, riskRadiusFields) as cursor:
             for row in cursor:
+                # where clause
+                whereClause = "OBJECTID = {}".format(row[0])
+                # select the current record from the buffer layer using OBJECTID
+                # this will set each select by location to be run against the current feature in the buffer layer
+                arcpy.SelectLayerByAttribute_management('Buffer Layer', 'NEW_SELECTION', whereClause)
                 # Replace . with _ in buffer distance
                 buffer_distance_replace = str(row[2]).replace('.', '_')
                 # Buffer units and distance
@@ -70,7 +77,7 @@ def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb, resul
                 # Boiler place text for ArcPy message
                 message_text = 'PATTS {} risk radius {}-{}'.format(row[1], row[2], row[3])
                 # Clip US Census Blocks layer by SARA Facility record
-                clip_output_layer = arcpy.Clip_analysis(census_blocks, riskRadius, os.path.join(output_gdb, output_layer_name))
+                clip_output_layer = arcpy.Clip_analysis(census_blocks, 'Buffer Layer', os.path.join(output_gdb, output_layer_name))
                 # Add message that Clip is completed
                 arcpy.AddMessage('\nCensus Blocks clipped for {}'.format(message_text))
                 # Add field to hold clip area to original area ratio
