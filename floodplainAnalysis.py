@@ -3,17 +3,14 @@
 #
 # Ecosystem:   Used in SARAReportTool.py
 #
-# Purpose:     [update me]
-#
-# Summary:     [update me]
-#
-#
+# Purpose:     Module selects any building footprint features that contain the SARA facility.  If any building footprint features are selected,
+#              a test is performed to check if they intersect the Floodplain layer.  In any event, messages are logged to tool and to a text file.
 #
 # Author:      Patrick McKinney
 #
 # Created:     02/28/2019
 #
-# Updated:     02/28/2019
+# Updated:     04/11/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
