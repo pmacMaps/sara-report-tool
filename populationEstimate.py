@@ -15,7 +15,7 @@
 #
 # Created:     03/16/2016
 #
-# Updated:     4/4/2019
+# Updated:     4/17/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
@@ -100,9 +100,16 @@ def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb, resul
                 est_pop_table = createSummaryTable(output_gdb, output_layer_name,'Sum_Population', 'ESTPOP', clip_output_layer, message_text)
                 # create summary table for Estimated Housholds
                 est_households_table = createSummaryTable(output_gdb, output_layer_name, 'Sum_Households', 'ESTHOUSEHOLDS' , clip_output_layer, message_text)
-
-                # get values in tables and write to text file
-
+                # write estimated population to text file
+                text_file_contents += '\nEstimated 2010 Census population within {}-{} risk radius is '.format(row[2],row[3])
+                with arcpy.da.SearchCursor(est_pop_table, ['SUM_ESTPOP']) as pop_cursor:
+                    for line in pop_cursor:
+                        text_file_contents += '{}\n'.format(int(line[0]))
+                # write estimated households to text file
+                text_file_contents += '\nEstimated 2010 Census households within {}-{} risk radius is '.format(row[2],row[3])
+                with arcpy.da.SearchCursor(est_households_table, ['SUM_ESTHOUSEHOLDS']) as households_cursor:
+                    for line in households_cursor:
+                        text_file_contents += '{}\n'.format(int(line[0]))
             # end for
         # end cursor
     # If an error occurs running geoprocessing tool(s) capture error and write message
@@ -118,7 +125,9 @@ def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb, resul
         errorLogger.PrintException(e)
     finally:
         try:
+            with open(results_text_file, 'a') as f:
+                f.write(str(text_file_contents))
             if cursor:
                 del cursor
         except:
-            pass
+            arcpy.AddError('\nThere was an error writing the population and households results message to the project text file')
