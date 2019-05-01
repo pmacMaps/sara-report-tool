@@ -15,7 +15,7 @@
 #
 # Created:     07/26/2016
 #
-# Updated:     03/11/2019
+# Updated:     05/1/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
@@ -91,8 +91,8 @@ def createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,out_gbd,text_file):
         # run floodplain analysis module
         floodplainAnalysis.intersectFloodplainTest(output_spc,lon,lat,text_file)
 
-        # make sara risk radii layer available as input to other tools
-        return mrb_output
+        # make projected sara site and sara risk radii layer  available as input to other tools
+        return output_spc, mrb_output
     # If an error occurs running geoprocessing tool(s) capture error and write message
     # handle error outside of Python system
     except EnvironmentError as e:

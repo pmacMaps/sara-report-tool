@@ -11,7 +11,7 @@
 # Author:      Patrick McKinney
 # Created:     08/10/2016
 #
-# Updated:     03/11/2019
+# Updated:     05/1/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
@@ -24,7 +24,7 @@
 #----------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 # import modules
-import arcpy, os, riskRadius, populationEstimate, vulnerableFacilities, errorLogger
+import arcpy, os, riskRadius, populationEstimate, vulnerableFacilities, errorLogger, createMap
 
 try:
     # User entered variables from ArcGIS tool
@@ -53,13 +53,16 @@ try:
     arcpy.AddMessage('\nCreated project file geodatabase {} in {}'.format(output_gdb_name, output_dir))
 
     # Run multiple ring buffer (risk radii)
-    risk_radii_output = riskRadius.createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,output_gdb,results_text_file)
+    sara_site, risk_radii_output = riskRadius.createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,output_gdb,results_text_file)
 
     # Run census popluation estimate tool
     populationEstimate.estimateCensusPopulation(risk_radii_output, patts_id, output_dir, output_gdb, results_text_file)
 
     # Run vulnerable facilities analysis tool
     vulnerableFacilities.vulnerableFacilitiesAnalysis(risk_radii_output, output_dir)
+
+    # Run map generation tool
+    # createMap.createSaraMap()
 # If an error occurs running geoprocessing tool(s) capture error and write message
 # handle error outside of Python system
 except EnvironmentError as e:
