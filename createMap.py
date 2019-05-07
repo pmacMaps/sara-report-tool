@@ -29,28 +29,6 @@ def createSaraMap(sara_site, risk_radii, sara_name, sara_address, patts, output_
         # create a layer file to disk for Risk Radii
         risk_radii_lyr = saveLayerFile(risk_radii,'Risk_Radii',output_dir)
 
-        # Delete this section after you validate function works
-
-        # create temporary layer file (.lyr) so the SARA Site can be added to the project map
-        # you could delete this layer file at the end of the script if you wanted
-        # make feature layer for SARA Site (created from input latitude/longitude)
-        #arcpy.MakeFeatureLayer_management(sara_site,'SARA_Site')
-        # create a layer (.lyr) file
-        # directory and name of layer file
-        #out_layer_file_sara = r'{}\{} Site.lyr'.format(output_dir,sara_name)
-        # save as a layer file
-        #arcpy.SaveToLayerFile_management('SARA_Site',out_layer_file_sara,"RELATIVE")
-
-        # create temporary layer file (.lyr) so the Risk Radii can be added to the project map
-        # you could delete this layer file at the end of the script if you wanted
-        # make feature layer for Risk Radii (created from input latitude/longitude)
-        #arcpy.MakeFeatureLayer_management(risk_radii,'Risk_Radii')
-        # create a layer (.lyr) file
-        # directory and name of layer file
-        #out_layer_file_radii = r'{}\Risk Radii.lyr'.format(output_dir)
-        # save as a layer file
-        #arcpy.SaveToLayerFile_management('Risk_Radii',out_layer_file_radii,"RELATIVE")
-
         # create map document object for template map
         # update to r'C:\GIS\Scripts\SARA\Templates\SARA Radius Map Template.mxd'
         mxd_template = arcpy.mapping.MapDocument(r'F:\Scripts\ArcGIS Geoprocessing\SARA Tool\Templates\SARA Radius Map Template.mxd')
@@ -93,14 +71,10 @@ def createSaraMap(sara_site, risk_radii, sara_name, sara_address, patts, output_
         # update symbology
         arcpy.mapping.UpdateLayer(data_frame,risk_radii_of_interest,risk_radii_symbol_file,True)
 
-        # update map extent
-        arcpy.MakeFeatureLayer_management(risk_radii_of_interest, 'Risk_Radii_Map')
-        # select records
-        arcpy.SelectLayerByAttribute_management('Risk_Radii_Map','NEW_SELECTION',"OBJECTID > 0")
-        # set map extent to all records in risk radii layer
-        data_frame.extent = risk_radii_of_interest.getSelectedExtent()
-        # unselect records so they don't appear as selected in map document or export to png
-        arcpy.SelectLayerByAttribute_management('Risk_Radii_Map','CLEAR_SELECTION')
+        # set map extent
+        data_frame.extent = risk_radii_of_interest.getExtent(True)
+        # set scale a little larger to add padding
+        data_frame.scale = data_frame.scale * 1.1
 
         # update SARA Name for map
         sara_name_text = arcpy.mapping.ListLayoutElements(project_mxd,'TEXT_ELEMENT','SARA_Title_Text')[0]
@@ -125,15 +99,13 @@ def createSaraMap(sara_site, risk_radii, sara_name, sara_address, patts, output_
         project_mxd.save()
         # add message
         arcpy.AddMessage('\nSaved the project map document')
-        # print 'Saved map document {}\n'.format(mxdCopy)
         # export map to png using current date in file name
         # file name
-        png_name = r'{} Risk Radius Map {}.png'.format(sara_name,date_today)
+        png_name = r'{} Risk Radius Map {}.png'.format(sara_name,date_formatted)
         # export map to pdf using default settings
         arcpy.mapping.ExportToPNG(project_mxd,os.path.join(output_dir,png_name),"PAGE_LAYOUT",resolution=300)
         # add message
         arcpy.AddMessage('\nExported project map to png format.  File is named {}'.format(png_name))
-        # print 'Exported map to pdf at {}\n'.format(outputFolder)
     # If an error occurs running geoprocessing tool(s) capture error and write message
     # handle error outside of Python system
     except EnvironmentError as e:
