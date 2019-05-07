@@ -1,4 +1,4 @@
-#---------------------------------------------------------------------------------------------------------------------------------------------------------#
+###---------------------------------------------------------------------------------------------------------------------------------------------------------#
 # Name:        SARA Reporting Tool
 #
 # Purpose:     To generate risk radii for a SARA facility, estimate the residential population within each risk raidus,
@@ -6,12 +6,12 @@
 #
 # Summary:     User enters the latitude, longitude, and PATTS ID for the SARA facility, risk radius distances and units, and the folder location
 #              for the listing of vulnerable facilities in an ArcGIS Desktop tool form.  The tool then runs three analyses: create the risk radii,
-#              estimate residential population, and extract vulnerable facilities.#
+#              estimate residential population, and extract vulnerable facilities.  A project map is generated and exported to png
 #
 # Author:      Patrick McKinney
 # Created:     08/10/2016
 #
-# Updated:     05/1/2019
+# Updated:     05/7/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
@@ -28,18 +28,22 @@ import arcpy, os, riskRadius, populationEstimate, vulnerableFacilities, errorLog
 
 try:
     # User entered variables from ArcGIS tool
-    # latitude - double
-    lat = float(arcpy.GetParameterAsText(0))
-    # longitude - double
-    lon = float(arcpy.GetParameterAsText(1))
+    # name of SARA facility - string
+    sara_name = arcpy.GetParameterAsText(0)
+    # address of SARA facility - string
+    sara_address = arcpy.GetParameterAsText(1)
     # PATTS ID - string
     patts_id = arcpy.GetParameterAsText(2)
-    # Buffer distances - double, multi-value
-    mrb_distances = arcpy.GetParameterAsText(3)
+    # latitude of SARA facility - double
+    lat = float(arcpy.GetParameterAsText(3))
+    # longitude of SARA facility - double
+    lon = float(arcpy.GetParameterAsText(4))
+    # Buffer distances for risk radii - double, multi-value
+    mrb_distances = arcpy.GetParameterAsText(5)
     # Buffer units - string, drop-down list
-    mrb_units = arcpy.GetParameterAsText(4)
+    mrb_units = arcpy.GetParameterAsText(6)
     # Output directory for analysis reslts - folder
-    output_dir = arcpy.GetParameterAsText(5)
+    output_dir = arcpy.GetParameterAsText(7)
     # out file geodatabase nam
     output_gdb_name = 'Analysis_Results_PATTS_{}'.format(patts_id)
     # output file geodatabase
@@ -62,7 +66,7 @@ try:
     vulnerableFacilities.vulnerableFacilitiesAnalysis(risk_radii_output, output_dir)
 
     # Run map generation tool
-    # createMap.createSaraMap()
+    createMap.createSaraMap(sara_site,risk_radii_output,sara_name,sara_address,patts_id,output_dir)
 # If an error occurs running geoprocessing tool(s) capture error and write message
 # handle error outside of Python system
 except EnvironmentError as e:
