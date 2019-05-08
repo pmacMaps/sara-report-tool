@@ -1,12 +1,15 @@
 #-------------------------------------------------------------------------------
 # Name:        Create SARA Facility Map and PNG Export
 #
+# Summary:     Creates a project MXD file from a template file.  Adds the SARA
+#              facility and risk radii layers to project map.  Saves the map
+#              and exports as PNG file.
+#
 # Author:      Patrick McKinney
 #
 # Created:     4/25/19
 #
-#
-# Updated:     5/7/19
+# Updated:     5/8/19
 #-------------------------------------------------------------------------------
 
 # Import modules
@@ -25,9 +28,9 @@ def saveLayerFile(layer,name,out_dir):
 def createSaraMap(sara_site, risk_radii, sara_name, sara_address, patts, output_dir):
     try:
         # create a layer file to disk for SARA Facility
-        sara_lyr = saveLayerFile(sara_site,'SARA_Site',output_dir)
+        sara_lyr = saveLayerFile(sara_site,'SARA Site',output_dir)
         # create a layer file to disk for Risk Radii
-        risk_radii_lyr = saveLayerFile(risk_radii,'Risk_Radii',output_dir)
+        risk_radii_lyr = saveLayerFile(risk_radii,'Risk Radii',output_dir)
 
         # create map document object for template map
         # update to r'C:\GIS\Scripts\SARA\Templates\SARA Radius Map Template.mxd'
@@ -42,9 +45,12 @@ def createSaraMap(sara_site, risk_radii, sara_name, sara_address, patts, output_
         project_mxd = arcpy.mapping.MapDocument(project_mxd_file)
         # create data frame object (so you can add a layer to a map)
         data_frame = arcpy.mapping.ListDataFrames(project_mxd)[0]
+        # gain access to legend element
+        map_legend = arcpy.mapping.ListLayoutElements(project_mxd, "LEGEND_ELEMENT", "Legend")[0]
+        # if a layer is added to map, add it to map legend
+        map_legend.autoAdd = True
 
         # add SARA Facility to map document
-        # make sure to del this variable to release the lock
         # sara layer file on disk - this represents a layer file, not the layer as it is added to the map document
         sara_temp = arcpy.mapping.Layer(sara_lyr)
         # add layer to map document
@@ -58,7 +64,6 @@ def createSaraMap(sara_site, risk_radii, sara_name, sara_address, patts, output_
         arcpy.mapping.UpdateLayer(data_frame,sara_of_interest,sara_symbol_file,True)
 
         # add risk radii to map
-        # make sure to del this variable to release the lock
         # risk radii layer file on disk - this represents a layer file, not the layer as it is added to the map document
         risk_radii_temp = arcpy.mapping.Layer(risk_radii_lyr)
         # add layer to map document
