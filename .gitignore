@@ -1,0 +1,4 @@
+# You may want a "test" directory for testing/debugging the tool
+Test/
+# compiled python file that runs when a module is imported and run
+*.pyc
