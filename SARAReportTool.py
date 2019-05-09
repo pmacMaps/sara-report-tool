@@ -24,7 +24,7 @@
 #----------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 # import modules
-import arcpy, os, riskRadius, populationEstimate, vulnerableFacilities, errorLogger, createMap
+import arcpy, os, datetime, riskRadius, populationEstimate, vulnerableFacilities, createMap, errorLogger
 
 try:
     # User entered variables from ArcGIS tool
@@ -46,29 +46,40 @@ try:
     mrb_units = arcpy.GetParameterAsText(7)
     # Output directory for analysis reslts - folder
     output_dir = arcpy.GetParameterAsText(8)
+
+    # get current date
+    date_today = datetime.date.today()
+    # formatted data YYYY-MM-DD
+    formatted_date = date_today.strftime("%Y-%m-%d")
+    # create sub-directory to store files
+    sub_dir = os.path.join(output_dir,formatted_date)
+    os.mkdir(sub_dir)
+    # add message
+    arcpy.AddMessage('\nCreated project directory at "{}"'.format(sub_dir))
+
     # out file geodatabase nam
     output_gdb_name = 'Analysis_Results_PATTS_{}'.format(patts_id)
     # output file geodatabase
-    output_gdb = '{}.gdb'.format(os.path.join(output_dir,output_gdb_name))
+    output_gdb = '{}.gdb'.format(os.path.join(sub_dir,output_gdb_name))
     # create a text file in output location
-    results_text_file = r'{}\SARA_Analysis_Results_PATTS_{}.txt'.format(output_dir,patts_id)
+    results_text_file = r'{}\SARA_Analysis_Results_PATTS_{}.txt'.format(sub_dir,patts_id)
 
     # create project file geodatabase
-    arcpy.CreateFileGDB_management(output_dir, output_gdb_name, '10.0')
+    arcpy.CreateFileGDB_management(sub_dir, output_gdb_name, '10.0')
     # add message to user
-    arcpy.AddMessage('\nCreated project file geodatabase {} in {}'.format(output_gdb_name, output_dir))
+    arcpy.AddMessage('\nCreated project file geodatabase "{}"'.format(output_gdb_name))
 
     # Run multiple ring buffer (risk radii)
     sara_site, risk_radii_output = riskRadius.createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,output_gdb,results_text_file)
 
     # Run census popluation estimate tool
-    populationEstimate.estimateCensusPopulation(risk_radii_output, patts_id, output_dir, output_gdb, results_text_file)
+    populationEstimate.estimateCensusPopulation(risk_radii_output, patts_id, sub_dir, output_gdb, results_text_file)
 
     # Run vulnerable facilities analysis tool
-    vulnerableFacilities.vulnerableFacilitiesAnalysis(risk_radii_output, output_dir)
+    vulnerableFacilities.vulnerableFacilitiesAnalysis(risk_radii_output, sub_dir)
 
     # Run map generation tool
-    createMap.createSaraMap(sara_site,risk_radii_output,sara_name,sara_address,patts_id,chem_info,output_dir)
+    createMap.createSaraMap(sara_site,risk_radii_output,sara_name,sara_address,patts_id,chem_info,sub_dir)
 # If an error occurs running geoprocessing tool(s) capture error and write message
 # handle error outside of Python system
 except EnvironmentError as e:
