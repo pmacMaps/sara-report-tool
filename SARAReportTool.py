@@ -11,7 +11,7 @@
 # Author:      Patrick McKinney
 # Created:     08/10/2016
 #
-# Updated:     05/7/2019
+# Updated:     05/9/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
@@ -34,16 +34,18 @@ try:
     sara_address = arcpy.GetParameterAsText(1)
     # PATTS ID - string
     patts_id = arcpy.GetParameterAsText(2)
+    # checmial information - string
+    chem_info = arcpy.GetParameterAsText(3)
     # latitude of SARA facility - double
-    lat = float(arcpy.GetParameterAsText(3))
+    lat = float(arcpy.GetParameterAsText(4))
     # longitude of SARA facility - double
-    lon = float(arcpy.GetParameterAsText(4))
+    lon = float(arcpy.GetParameterAsText(5))
     # Buffer distances for risk radii - double, multi-value
-    mrb_distances = arcpy.GetParameterAsText(5)
+    mrb_distances = arcpy.GetParameterAsText(6)
     # Buffer units - string, drop-down list
-    mrb_units = arcpy.GetParameterAsText(6)
+    mrb_units = arcpy.GetParameterAsText(7)
     # Output directory for analysis reslts - folder
-    output_dir = arcpy.GetParameterAsText(7)
+    output_dir = arcpy.GetParameterAsText(8)
     # out file geodatabase nam
     output_gdb_name = 'Analysis_Results_PATTS_{}'.format(patts_id)
     # output file geodatabase
@@ -66,7 +68,7 @@ try:
     vulnerableFacilities.vulnerableFacilitiesAnalysis(risk_radii_output, output_dir)
 
     # Run map generation tool
-    createMap.createSaraMap(sara_site,risk_radii_output,sara_name,sara_address,patts_id,output_dir)
+    createMap.createSaraMap(sara_site,risk_radii_output,sara_name,sara_address,patts_id,chem_info,output_dir)
 # If an error occurs running geoprocessing tool(s) capture error and write message
 # handle error outside of Python system
 except EnvironmentError as e:
