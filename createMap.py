@@ -33,9 +33,8 @@ def createSaraMap(sara_site, risk_radii, sara_name, sara_address, patts, chem_in
         risk_radii_lyr = saveLayerFile(risk_radii,'Risk Radii',output_dir)
 
         # create map document object for template map
-        # F:\Scripts\ArcGIS Geoprocessing\SARA Tool\Templates
-        # mxd_template = arcpy.mapping.MapDocument(r'C:\GIS\Scripts\SARA\Templates\SARA Radius Map Template.mxd')
-        mxd_template = arcpy.mapping.MapDocument(r'F:\Scripts\ArcGIS Geoprocessing\SARA Tool\Templates\SARA Radius Map Template.mxd')
+        mxd_template = arcpy.mapping.MapDocument(r'C:\GIS\Scripts\SARA\Templates\SARA Radius Map Template.mxd')
+        # mxd_template = arcpy.mapping.MapDocument(r'F:\Scripts\ArcGIS Geoprocessing\SARA Tool\Templates\SARA Radius Map Template.mxd')
         # create a copy of the template map document
         project_mxd_file = os.path.join(output_dir, 'SARA_Project_Map.mxd')
         # save a copy of template map
@@ -59,8 +58,8 @@ def createSaraMap(sara_site, risk_radii, sara_name, sara_address, patts, chem_in
         # create object reference streams layer within map document
         sara_of_interest = arcpy.mapping.ListLayers(project_mxd,'*SARA*',data_frame)[0]
         # add symbology layer
-        # F:\Scripts\ArcGIS Geoprocessing\SARA Tool\Templates
-        sara_symbol_file = arcpy.mapping.Layer(r'F:\Scripts\ArcGIS Geoprocessing\SARA Tool\Templates\SARA of Interest.lyr')
+        # sara_symbol_file = arcpy.mapping.Layer(r'F:\Scripts\ArcGIS Geoprocessing\SARA Tool\Templates\SARA of Interest.lyr')
+        sara_symbol_file = arcpy.mapping.Layer(r'C:\GIS\Scripts\SARA\Templates\SARA of Interest.lyr')
         # update symbology
         arcpy.mapping.UpdateLayer(data_frame,sara_of_interest,sara_symbol_file,True)
 
@@ -72,8 +71,8 @@ def createSaraMap(sara_site, risk_radii, sara_name, sara_address, patts, chem_in
         # create object reference streams layer within map document
         risk_radii_of_interest = arcpy.mapping.ListLayers(project_mxd,'*Risk*',data_frame)[0]
         # add symbology layer
-        # F:\Scripts\ArcGIS Geoprocessing\SARA Tool\Templates
-        risk_radii_symbol_file = arcpy.mapping.Layer(r'F:\Scripts\ArcGIS Geoprocessing\SARA Tool\Templates\Risk Radii.lyr')
+        # risk_radii_symbol_file = arcpy.mapping.Layer(r'F:\Scripts\ArcGIS Geoprocessing\SARA Tool\Templates\Risk Radii.lyr')
+        risk_radii_symbol_file = arcpy.mapping.Layer(r'C:\GIS\Scripts\SARA\Templates\Risk Radii.lyr')
         # update symbology
         arcpy.mapping.UpdateLayer(data_frame,risk_radii_of_interest,risk_radii_symbol_file,True)
 
