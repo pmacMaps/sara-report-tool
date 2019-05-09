@@ -10,7 +10,7 @@
 #
 # Created:     02/28/2019
 #
-# Updated:     04/11/2019
+# Updated:     05/9/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
@@ -51,7 +51,9 @@ def intersectFloodplainTest(projected_point,lon,lat,results_text_file):
         # if no features selected, add warning message
         if features_count == 0:
             # add warning message
-            arcpy.AddWarning('\nNo Building Footprints contain the SARA Site located at latitude: {}; longitude: {}'.format(lat,lon))
+            message = 'No Building Footprints contain the SARA Site located at latitude: {}; longitude: {}'.format(lat,lon)
+            arcpy.AddWarning('\n{}'.format(message))
+            text_file_contents += '\n{}\n'.format(message)
         # if a building footprint is selected, test if it intersects a floodplain
         else:
             arcpy.SelectLayerByLocation_management('Building_Footprints', 'INTERSECT', 'Floodplains', selection_type='SUBSET_SELECTION')
