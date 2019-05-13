@@ -15,7 +15,7 @@
 #
 # Created:     04/28/2016
 #
-# Updated:     03/20/2019
+# Updated:     05/13/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
@@ -46,8 +46,6 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
         arcpy.AddMessage('\nPerforming Vulnerable Facilities analysis\nResults of analysis will be located at {}'.format(output_dir))
         # create sub-directory to store results of vulnerable facilities anlaysis
         os.mkdir(os.path.join(output_dir, 'Vulnerable Facilities Analysis Results'))
-        # add message
-        arcpy.AddMessage('\nCreated output directory for Vulnerable Facilities Analysis spreadsheets')
         # output directory for spreadsheets
         output_dir_xls = r'{}\{}'.format(output_dir,'Vulnerable Facilities Analysis Results')
         # Vulnerable Facilities Sites
