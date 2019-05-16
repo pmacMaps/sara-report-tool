@@ -13,18 +13,15 @@
 #
 # Created:     04/28/2016
 #
-# Updated:     03/20/2019
+# Updated:     05/13/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
-# Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THIS TOOL.
-#              THE TOOL IS PROVIDED WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
-#              OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-#              MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-#              Furthermore, Cumberland County assumes no liability for any errors,
-#              omissions, or inaccuracies in the information provided regardless
-#              of the cause of such, or for any decision made, action taken, or action
-#              not taken by the user in reliance upon any maps or data provided
+# Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THESE MAPS OR DATA. THE MAPS AND DATA ARE PROVIDED WITHOUT
+#              WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+#              FITNESS FOR A PARTICULAR PURPOSE.
+#              Furthermore, Cumberland County assumes no liability for any errors, omissions, or inaccuracies in the information provided regardless
+#              of the cause of such, or for any decision made, action taken, or action not taken by the user in reliance upon any maps or data provided
 #              herein. The user assumes the risk that the information may not be accurate.
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
@@ -47,8 +44,6 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
         arcpy.AddMessage('\nPerforming Vulnerable Facilities analysis\nResults of analysis will be located at {}'.format(output_dir))
         # create sub-directory to store results of vulnerable facilities anlaysis
         os.mkdir(os.path.join(output_dir, 'Vulnerable Facilities Analysis Results'))
-        # add message
-        arcpy.AddMessage('\nCreated output directory for Vulnerable Facilities Analysis spreadsheets')
         # output directory for spreadsheets
         output_dir_xls = r'{}\{}'.format(output_dir,'Vulnerable Facilities Analysis Results')
         # Vulnerable Facilities Sites

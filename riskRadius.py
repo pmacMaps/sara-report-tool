@@ -13,18 +13,15 @@
 #
 # Created:     07/26/2016
 #
-# Updated:     05/1/2019
+# Updated:     05/13/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
-# Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THIS TOOL.
-#              THE TOOL IS PROVIDED WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
-#              OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-#              MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-#              Furthermore, Cumberland County assumes no liability for any errors,
-#              omissions, or inaccuracies in the information provided regardless
-#              of the cause of such, or for any decision made, action taken, or action
-#              not taken by the user in reliance upon any maps or data provided
+# Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THESE MAPS OR DATA. THE MAPS AND DATA ARE PROVIDED WITHOUT
+#              WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+#              FITNESS FOR A PARTICULAR PURPOSE.
+#              Furthermore, Cumberland County assumes no liability for any errors, omissions, or inaccuracies in the information provided regardless
+#              of the cause of such, or for any decision made, action taken, or action not taken by the user in reliance upon any maps or data provided
 #              herein. The user assumes the risk that the information may not be accurate.
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------#
 
@@ -63,33 +60,28 @@ def createRiskRadii(lat,lon,patts_id,mrb_distances,mrb_units,out_gbd,text_file):
         # Run tool
         arcpy.MultipleRingBuffer_analysis(output_spc,mrb_output,mrb_distances,mrb_units,mrb_distance_field,mrb_dissolve_option)
         # Add message that Multiple Ring Buffer tool complete
-        arcpy.AddMessage('\nSARA Risk Radii created for PATTS #{}'.format(patts_id))
+
         # Add field to output layer with PATTS ID
         field_name_patts = 'PATTS'
         field_type = 'TEXT'
         field_expression_patts = '"{}"'.format(patts_id)
         # Execut Add Field Management tool
         arcpy.AddField_management(mrb_output,field_name_patts,field_type)
-        # Add message that PATTS ID added to layer
-        arcpy.AddMessage('\nPATTS ID field added')
         # Calculate PATTS ID to field
         arcpy.CalculateField_management(mrb_output, field_name_patts, field_expression_patts, 'PYTHON_9.3')
-        # Add message that PATTS ID added to PATTS ID field
-        arcpy.AddMessage('\nPATTS ID #{} added to PATTS ID field'.format(patts_id))
+
         # Add field to output layer with buffer distance units
         field_name_units = 'UNITS'
         field_expression_units = '"{}"'.format(mrb_units)
         # Execut Add Field Management tool
         arcpy.AddField_management(mrb_output,field_name_units,field_type)
-        # Add message that Units field added to layer
-        arcpy.AddMessage('\nUNITS field added')
         # Calculate buffer distance units
         arcpy.CalculateField_management(mrb_output, field_name_units, field_expression_units, 'PYTHON_9.3')
         # Add message that buffer distance units added to Units field
-        arcpy.AddMessage('\nThe units {} added to the UNITS field'.format(mrb_units))
-        arcpy.AddMessage('\nPerforming analysis to see if SARA facility is within a floodplain')
+        arcpy.AddMessage('\nCompleted adding fields to Risk Radius/Radii map layer')
 
         # run floodplain analysis module
+        arcpy.AddMessage('\nPerforming analysis to see if SARA facility is within a floodplain')
         floodplainAnalysis.intersectFloodplainTest(output_spc,lon,lat,text_file)
 
         # make projected sara site and sara risk radii layer  available as input to other tools

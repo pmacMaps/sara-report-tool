@@ -1,28 +1,25 @@
-#----------------------------------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------#
 # Name:        Floodplain Analysis
 #
-# Purpose:     Module selects any building footprint features that contain the SARA facility.
-#              If any building footprint features are selected, a test is performed to check
-#              if they intersect the Floodplain layer.  In any event, messages are logged to tool and to a text file.
+#
+# Purpose:     Module selects any building footprint features that contain the SARA facility.  If any building footprint features are selected,
+#              a test is performed to check if they intersect the Floodplain layer.  In any event, messages are logged to tool and to a text file.
 #
 # Author:      Patrick McKinney
 #
 # Created:     02/28/2019
 #
-# Updated:     04/11/2019
+# Updated:     05/9/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
-# Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THIS TOOL.
-#              THE TOOL IS PROVIDED WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
-#              OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-#              MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-#              Furthermore, Cumberland County assumes no liability for any errors,
-#              omissions, or inaccuracies in the information provided regardless
-#              of the cause of such, or for any decision made, action taken, or action
-#              not taken by the user in reliance upon any maps or data provided
+# Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THESE MAPS OR DATA. THE MAPS AND DATA ARE PROVIDED WITHOUT
+#              WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+#              FITNESS FOR A PARTICULAR PURPOSE.
+#              Furthermore, Cumberland County assumes no liability for any errors, omissions, or inaccuracies in the information provided regardless
+#              of the cause of such, or for any decision made, action taken, or action not taken by the user in reliance upon any maps or data provided
 #              herein. The user assumes the risk that the information may not be accurate.
-#-------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 # import modules
 import arcpy, os, errorLogger
@@ -53,7 +50,9 @@ def intersectFloodplainTest(projected_point,lon,lat,results_text_file):
         # if no features selected, add warning message
         if features_count == 0:
             # add warning message
-            arcpy.AddWarning('\nNo Building Footprints contain the SARA Site located at latitude: {}; longitude: {}'.format(lat,lon))
+            message = 'No Building Footprints contain the SARA Site located at latitude: {}; longitude: {}'.format(lat,lon)
+            arcpy.AddWarning('\n{}'.format(message))
+            text_file_contents += '\n{}\n'.format(message)
         # if a building footprint is selected, test if it intersects a floodplain
         else:
             arcpy.SelectLayerByLocation_management('Building_Footprints', 'INTERSECT', 'Floodplains', selection_type='SUBSET_SELECTION')

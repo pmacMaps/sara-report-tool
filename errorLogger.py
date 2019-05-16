@@ -1,4 +1,5 @@
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------#
+<<<<<<< HEAD
 # Name:        Error Logging Function
 #
 # Purpose:     Create an error message that includes the file name and line number of the error.
@@ -19,6 +20,7 @@
 #              omissions, or inaccuracies in the information provided regardless
 #              of the cause of such, or for any decision made, action taken, or action
 #              not taken by the user in reliance upon any maps or data provided
+
 #              herein. The user assumes the risk that the information may not be accurate.
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------#
 

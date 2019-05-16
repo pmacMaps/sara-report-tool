@@ -13,18 +13,15 @@
 #
 # Created:     03/16/2016
 #
-# Updated:     4/17/2019
+# Updated:     5/13/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
-# Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THIS TOOL.
-#              THE TOOL IS PROVIDED WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
-#              OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-#              MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-#              Furthermore, Cumberland County assumes no liability for any errors,
-#              omissions, or inaccuracies in the information provided regardless
-#              of the cause of such, or for any decision made, action taken, or action
-#              not taken by the user in reliance upon any maps or data provided
+# Disclaimer:  CUMBERLAND COUNTY ASSUMES NO LIABILITY ARISING FROM USE OF THESE MAPS OR DATA. THE MAPS AND DATA ARE PROVIDED WITHOUT
+#              WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+#              FITNESS FOR A PARTICULAR PURPOSE.
+#              Furthermore, Cumberland County assumes no liability for any errors, omissions, or inaccuracies in the information provided regardless
+#              of the cause of such, or for any decision made, action taken, or action not taken by the user in reliance upon any maps or data provided
 #              herein. The user assumes the risk that the information may not be accurate.
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------#
 
@@ -34,17 +31,14 @@ import arcpy, os, errorLogger
 def updateProportionalValues(field_name, field_type, layer, message, calc_field):
     """add fields and calculate values for those created fields"""
     arcpy.AddField_management(layer, field_name, field_type)
-    arcpy.AddMessage('\nAdded field "{}" for {}'.format(field_name,message))
     field_expression = '!{}! * !AREARATIO!'.format(calc_field)
     arcpy.CalculateField_management(layer, field_name, field_expression, 'PYTHON_9.3')
-    arcpy.AddMessage('\nCompleted field calculation for field "{}"'.format(calc_field))
 
 def createSummaryTable(gdb, base_layer, table_name, summary_field, layer, message):
     """Create a summary table for a provided layer and field"""
     out_table = os.path.join(gdb, '{}_{}'.format(base_layer, table_name))
     stats_fields = [[summary_field, 'SUM']]
     arcpy.Statistics_analysis(layer, out_table, stats_fields)
-    arcpy.AddMessage('\nCreated summary table for field "{}" for {}'.format(summary_field, message))
     return out_table
 
 def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb, results_text_file):
@@ -86,13 +80,9 @@ def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb, resul
                 area_ratio_field_type = 'DOUBLE'
                 # Execut Add Field tool
                 arcpy.AddField_management(clip_output_layer, area_ratio_field_name, area_ratio_field_type)
-                # Add message that Area Ratio Field has been added
-                arcpy.AddMessage('\nArea Ratio field added for {}'.format(message_text))
                 # Calculate the new area to old area ratio for each Census Block
                 area_ratio_field_expression = '!Shape_Area! / !ORAREA!'
                 arcpy.CalculateField_management(clip_output_layer, 'AREARATIO', area_ratio_field_expression, 'PYTHON_9.3')
-                # Add message that Area Ratio has been calculated
-                arcpy.AddMessage('\nNew area to original area ratio calculated for {}'.format(message_text))
                 # Add field for Estimated Population and calculate value
                 updateProportionalValues('ESTPOP', 'LONG', clip_output_layer, message_text, 'POP10')
                 # Add field for Estimated Households and calculate value
@@ -101,6 +91,8 @@ def estimateCensusPopulation(riskRadius, patts_id, output_dir, output_gdb, resul
                 est_pop_table = createSummaryTable(output_gdb, output_layer_name,'Sum_Population', 'ESTPOP', clip_output_layer, message_text)
                 # create summary table for Estimated Housholds
                 est_households_table = createSummaryTable(output_gdb, output_layer_name, 'Sum_Households', 'ESTHOUSEHOLDS' , clip_output_layer, message_text)
+                # Add Message
+                arcpy.AddMessage('\nCompleted calculating estimated 2010 U.S. Census Population and Households for {}'.format(message_text))
                 # write estimated population to text file
                 text_file_contents += '\nEstimated 2010 Census population within {}-{} risk radius is '.format(row[2],row[3])
                 with arcpy.da.SearchCursor(est_pop_table, ['SUM_ESTPOP']) as pop_cursor:

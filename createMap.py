@@ -9,7 +9,7 @@
 #
 # Created:     4/25/19
 #
-# Updated:     5/8/19
+# Updated:     5/9/19
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
@@ -37,7 +37,7 @@ def saveLayerFile(layer,name,out_dir):
         # get access to layer file
         return out_layer_file
 
-def createSaraMap(sara_site, risk_radii, sara_name, sara_address, patts, output_dir):
+def createSaraMap(sara_site, risk_radii, sara_name, sara_address, patts, chem_info, output_dir):
     try:
         # create a layer file to disk for SARA Facility
         sara_lyr = saveLayerFile(sara_site,'SARA Site',output_dir)
@@ -99,6 +99,11 @@ def createSaraMap(sara_site, risk_radii, sara_name, sara_address, patts, output_
         # update SARA PATTS for map
         sara_patts_text = arcpy.mapping.ListLayoutElements(project_mxd,'TEXT_ELEMENT','SARA_PATTS_Text')[0]
         sara_patts_text.text = sara_patts_text.text.replace('x', str(patts))
+
+        # update chemical information
+        sara_chem_text = arcpy.mapping.ListLayoutElements(project_mxd,'TEXT_ELEMENT','SARA_Chem_Text')[0]
+        sara_chem_text.text = str(chem_info)
+
         # update date text element with current date
         # get current date
         date_today = datetime.date.today()
@@ -113,13 +118,14 @@ def createSaraMap(sara_site, risk_radii, sara_name, sara_address, patts, output_
         project_mxd.save()
         # add message
         arcpy.AddMessage('\nSaved the project map document')
-        # export map to png using current date in file name
+
+        # export map to pdf using current date in file name
         # file name
-        png_name = r'{} Risk Radius Map {}.png'.format(sara_name,date_formatted)
+        pdf_name = r'{} Risk Radius Map {}.pdf'.format(sara_name,date_formatted)
         # export map to pdf using default settings
-        arcpy.mapping.ExportToPNG(project_mxd,os.path.join(output_dir,png_name),"PAGE_LAYOUT",resolution=300)
+        arcpy.mapping.ExportToPDF(project_mxd,os.path.join(output_dir,pdf_name),'PAGE_LAYOUT', resolution=300)
         # add message
-        arcpy.AddMessage('\nExported project map to png format.  File is named {}'.format(png_name))
+        arcpy.AddMessage('\nExported project map to .pdf format.  File is named {}'.format(pdf_name))
     # If an error occurs running geoprocessing tool(s) capture error and write message
     # handle error outside of Python system
     except EnvironmentError as e:
