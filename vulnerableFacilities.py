@@ -15,7 +15,7 @@
 #
 # Created:     04/28/2016
 #
-# Updated:     05/13/2019
+# Updated:     05/22/2019
 #
 # Copyright:   (c) Cumberland County GIS 2019
 #
@@ -60,8 +60,12 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
         makeFeatureLayer('EOC_MHIDD_Facility','MHIDD')
         # Schools
         makeFeatureLayer('Site_Education','Schools')
+        # Public Shelters
+        makeFeatureLayer('EOC_PublicShelters', 'Public_Shelters')
         # SARA Facilities
         makeFeatureLayer('EOC_SARA', 'SARA')
+        # Emergency Response / Law Enforcement
+        makeFeatureLayer('Site_EmergencyResponseLawEnforcement', 'Emergency_Response_Law_Enforcement')
         # Hydrography (NHD)
         makeFeatureLayer('NHD_Streams', 'Streams')
         # Municipalities
@@ -96,8 +100,12 @@ def vulnerableFacilitiesAnalysis(riskRadius, output_dir):
                 exportLayersToExcel.selectFeaturesExportToExcel('MHIDD', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
                 # Schools
                 exportLayersToExcel.selectFeaturesExportToExcel('Schools', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
+                # Public Shelters
+                exportLayersToExcel.selectFeaturesExportToExcel('Public_Shelters', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
                 # SARA
                 exportLayersToExcel.selectFeaturesExportToExcel('SARA', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
+                # Emergency Response / Law Enforcement
+                exportLayersToExcel.selectFeaturesExportToExcel('Emergency_Response_Law_Enforcement', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
                 # Hydrography
                 exportLayersToExcel.selectFeaturesExportToExcel('Streams', 'Buffer Layer', row[2], row[3], row[1], output_dir_xls)
                 # Municipalities
