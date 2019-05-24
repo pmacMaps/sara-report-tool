@@ -1,5 +1,4 @@
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------#
-<<<<<<< HEAD
 # Name:        Error Logging Function
 #
 # Purpose:     Create an error message that includes the file name and line number of the error.
