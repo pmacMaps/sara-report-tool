@@ -9,7 +9,7 @@
 #
 # Created:     4/25/19
 #
-# Updated:     5/9/19
+# Updated:     5/30/19
 #-------------------------------------------------------------------------------
 
 # Import modules
@@ -84,15 +84,33 @@ def createSaraMap(sara_site, risk_radii, sara_name, sara_address, patts, chem_in
         # update SARA Name for map
         sara_name_text = arcpy.mapping.ListLayoutElements(project_mxd,'TEXT_ELEMENT','SARA_Title_Text')[0]
         sara_name_text.text = str(sara_name)
+
         # update SARA Address for map
         sara_address_text = arcpy.mapping.ListLayoutElements(project_mxd,'TEXT_ELEMENT','SARA_Address_Text')[0]
         sara_address_text.text = str(sara_address)
+
         # update SARA PATTS for map
         sara_patts_text = arcpy.mapping.ListLayoutElements(project_mxd,'TEXT_ELEMENT','SARA_PATTS_Text')[0]
         sara_patts_text.text = sara_patts_text.text.replace('x', str(patts))
+
         # update chemical information
         sara_chem_text = arcpy.mapping.ListLayoutElements(project_mxd,'TEXT_ELEMENT','SARA_Chem_Text')[0]
-        sara_chem_text.text = str(chem_info)
+        sara_chem_text.text = str('Chemical: {}'.format(chem_info))
+
+        # update risk radii information
+        # container for risk radii information
+        risk_radii_info = ''
+        # fields for cursor
+        risk_radii_fields = ['BUFFDIST','UNITS']
+        # perform search cursor on risk radii layer to get risk radii information
+        with arcpy.da.SearchCursor(risk_radii,risk_radii_fields) as cursor:
+            for row in cursor:
+                risk_radii_info += '{}-{}; '.format(row[0],row[1])
+            # end for in
+        # end cursor
+        # get map layout element
+        risk_radii_text = arcpy.mapping.ListLayoutElements(project_mxd,'TEXT_ELEMENT','SARA_Radii_Text')[0]
+        risk_radii_text.text = str('Risk Radii Distances: {}'.format(risk_radii_info))
 
         # update date text element with current date
         # get current date
