@@ -26,15 +26,16 @@ This tool collects parameters from the ArcGIS tool's form using the `arcpy.GetPa
 1. SARA Name (string) - the name of the SARA facility.<br>
 2. SARA Address (sring) - the street address of the SARA facility.<br>
 3. PATTS ID (string) - an unique identifier for each SARA facility.<br>
-4. Latitude (double) - the latitude in decimal degrees of the SARA facility.<br>
-5. Longitude (double) - the longitude in decimal degrees of the SARA facility.<br>
-6. Distances for Risk Radius (double; multiple values allowed) - the distance(s) for each risk radius buffer.<br>
-7. Risk Radius Units (string) - the units for the risk radius buffers<br>
-8. Output Directory (folder) - the folder location where the data and files for the analysis are generated.
+4. Chemical Info (string) - information about the chemical(s) being used for the analysis
+5. Latitude (double) - the latitude in decimal degrees of the SARA facility.<br>
+6. Longitude (double) - the longitude in decimal degrees of the SARA facility.<br>
+7. Distances for Risk Radius (double; multiple values allowed) - the distance(s) for each risk radius buffer.<br>
+8. Risk Radius Units (string) - the units for the risk radius buffers<br>
+9. Output Directory (folder) - the folder location where the data and files for the analysis are generated.
 
 #### errorLogger.py
 
-I will update this later.
+A helper module that handles reporting errors to the user.  It lists the error message, line number, and file in which the error occurs.  It is based upon a [custom geoprocessing tool](https://community.esri.com/docs/DOC-6496-download-arcgis-online-feature-service-or-arcgis-server-featuremap-service) developed by Esri's Jake Skinner.  
 
 #### riskRadius.py
 
@@ -42,7 +43,7 @@ I will update this later.
 
 #### floodplainAnalysis.py
 
-I will update this later.
+A helper module which tests whether a building polygon feature related to the user submitted latitude/longitude coordinates intersect a FEMA floodplain.  It is used within the `riskRadius.py` module.  A Select By Location analysis is performed between the point feature class (generated in `riskRadius.py`) and a building polygon layer.  If the building polygon layer contains the poin feature class, then the selected building polygon layer participates in a select by location analysis against the FEMA floodplain layer.  A message is written to an output text file as to whether the site intersects or does not intersect a floodplain.
 
 #### populationEstimate.py
 
@@ -50,7 +51,7 @@ I will update this later.
 
 #### exportLayersToExcel.py
 
-I will update this later.
+A helper module which converts a feature class to a Microsof Excel file.  It is used within the `vulnerableFacilities.py` module.  It performs a select by location between the `featureLayer` and `intersectLayer` parameters.  If records from the `featureLayer` are selected, the layer is exported to Excel.  If not features are selected, a warning message is provided to the user.
 
 #### vulnerableFacilities.py
 
