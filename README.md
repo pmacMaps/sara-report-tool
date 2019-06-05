@@ -39,7 +39,9 @@ A helper module that handles reporting errors to the user.  It lists the error m
 
 ### riskRadius.py
 
-I will update this later.
+This module takes the user entered latitude/longitude coordinates and re-projects it to State Plane coordinates.  It then creates a multi-ring buffer on the projected point layer, using the buffer units and distances provided by the user.  The `floodplainAnalysis.py` module is called within this module.  
+
+The projected point feature class and multi-ring buffer feature class are returned from the module for use in other parts of the analysis.
 
 ### floodplainAnalysis.py
 
@@ -59,4 +61,4 @@ I will update this later.
 
 ### createMap.py
 
-I will update this later.
+This module uses a template map document (.mxd) and creates a project map document for the analysis.  Information about the SARA site (name, address, and chemical information) is updated on the map.  The projected point and mulit-ring buffer layers are added to the map, and symbolized using layer (.lyr) files.  Lastly, the map is exported an Adobe Reader file (.pdf).
