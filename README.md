@@ -19,7 +19,7 @@ While this tool was created for a specific purpose, the scripts could be refacto
 
 This tool consists of eight (8) Python scripts.  `SARAReportTool.py` is the script that the custom tool is built from.  The other seven scripts are modules which are imported into `SARAReportTool.py` or other modules.
 
-#### SARAReportTool.py
+### SARAReportTool.py
 
 This tool collects parameters from the ArcGIS tool's form using the `arcpy.GetParameterAsText()` [method](http://pro.arcgis.com/en/pro-app/arcpy/functions/getparameterastext.htm).  All inputs are required.
 
@@ -33,30 +33,30 @@ This tool collects parameters from the ArcGIS tool's form using the `arcpy.GetPa
 8. Risk Radius Units (string) - the units for the risk radius buffers<br>
 9. Output Directory (folder) - the folder location where the data and files for the analysis are generated.
 
-#### errorLogger.py
+### errorLogger.py
 
 A helper module that handles reporting errors to the user.  It lists the error message, line number, and file in which the error occurs.  It is based upon a [custom geoprocessing tool](https://community.esri.com/docs/DOC-6496-download-arcgis-online-feature-service-or-arcgis-server-featuremap-service) developed by Esri's Jake Skinner.  
 
-#### riskRadius.py
+### riskRadius.py
 
 I will update this later.
 
-#### floodplainAnalysis.py
+### floodplainAnalysis.py
 
 A helper module which tests whether a building polygon feature related to the user submitted latitude/longitude coordinates intersect a FEMA floodplain.  It is used within the `riskRadius.py` module.  A Select By Location analysis is performed between the point feature class (generated in `riskRadius.py`) and a building polygon layer.  If the building polygon layer contains the poin feature class, then the selected building polygon layer participates in a select by location analysis against the FEMA floodplain layer.  A message is written to an output text file as to whether the site intersects or does not intersect a floodplain.
 
-#### populationEstimate.py
+### populationEstimate.py
 
 I will update this later.
 
-#### exportLayersToExcel.py
+### exportLayersToExcel.py
 
 A helper module which converts a feature class to a Microsof Excel file.  It is used within the `vulnerableFacilities.py` module.  It performs a select by location between the `featureLayer` and `intersectLayer` parameters.  If records from the `featureLayer` are selected, the layer is exported to Excel.  If not features are selected, a warning message is provided to the user.
 
-#### vulnerableFacilities.py
+### vulnerableFacilities.py
 
 I will update this later.
 
-#### createMap.py
+### createMap.py
 
 I will update this later.
