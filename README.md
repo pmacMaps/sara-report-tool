@@ -61,7 +61,20 @@ A helper module which converts a feature class to a Microsof Excel file.  It is 
 
 ### vulnerableFacilities.py
 
-I will update this later.
+This module is used to identify any vulnerable facilities within each risk radii.  I am not aware of any standard as to what a vulnerable facility is.  Our Emergency Management office defines these, and they have changed over time.  A `Select By Location` analysis is performed against each vulnerable facility within each risk radii ring.  If features are selected, then the selected features are exported to a Microsoft Excel file.  The `exportLayersToExcel.py` module is used to assist with this process.
+
+#### Vulnerable Facilities
+- Daycares
+- Health & Medical Sites (excluding pharmacies)
+- Schools (public & private)
+- Mental Health Intellecttual & Development Disabilities (MHIDD) Facilities
+- Public Shelters
+- SARA Facilities (hazmat)
+- Emergency Response & Law Enforcement Facilities
+- Hydrography (NHD polylines)
+- Municipalities (sub-divisions of counties)
+- Counties
+- Natural Gas Facilities
 
 ### createMap.py
 
