@@ -24,7 +24,7 @@ This tool consists of eight (8) Python scripts.  `SARAReportTool.py` is the scri
 This tool collects parameters from the ArcGIS tool's form using the `arcpy.GetParameterAsText()` [method](http://pro.arcgis.com/en/pro-app/arcpy/functions/getparameterastext.htm).  All inputs are required.
 
 1. SARA Name (string) - the name of the SARA facility.<br>
-2. SARA Address (sring) - the street address of the SARA facility.<br>
+2. SARA Address (string) - the street address of the SARA facility.<br>
 3. PATTS ID (string) - an unique identifier for each SARA facility.<br>
 4. Chemical Info (string) - information about the chemical(s) being used for the analysis
 5. Latitude (double) - the latitude in decimal degrees of the SARA facility.<br>
