@@ -45,7 +45,7 @@ The projected point feature class and multi-ring buffer feature class are return
 
 ### floodplainAnalysis.py
 
-A helper module which tests whether a building polygon feature related to the user submitted latitude/longitude coordinates intersect a FEMA floodplain.  It is used within the `riskRadius.py` module.  A Select By Location analysis is performed between the point feature class (generated in `riskRadius.py`) and a building polygon layer.  If the building polygon layer contains the poin feature class, then the selected building polygon layer participates in a select by location analysis against the FEMA floodplain layer.  A message is written to an output text file as to whether the site intersects or does not intersect a floodplain.
+A helper module which tests whether a building polygon feature related to the user submitted latitude/longitude coordinates intersect a FEMA floodplain.  It is used within the `riskRadius.py` module.  A `Select By Location` analysis is performed between the point feature class (generated in `riskRadius.py`) and a building polygon layer.  If the building polygon layer contains the point feature class, then the selected building polygon layer participates in a select by location analysis against the FEMA floodplain layer.  A message is written to an output text file as to whether the site intersects or does not intersect a floodplain.
 
 ### populationEstimate.py
 
