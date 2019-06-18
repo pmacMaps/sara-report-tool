@@ -30,7 +30,7 @@ This tool collects parameters from the ArcGIS tool's form using the `arcpy.GetPa
 5. Latitude (double) - the latitude in decimal degrees of the SARA facility.<br>
 6. Longitude (double) - the longitude in decimal degrees of the SARA facility.<br>
 7. Distances for Risk Radius (double; multiple values allowed) - the distance(s) for each risk radius buffer.<br>
-8. Risk Radius Units (string) - the units for the risk radius buffers<br>
+8. Risk Radius Units (string; drop-down list) - the units for the risk radius buffers<br>
 9. Output Directory (folder) - the folder location where the data and files for the analysis are generated.
 
 ### errorLogger.py
