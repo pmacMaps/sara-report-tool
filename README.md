@@ -49,7 +49,11 @@ A helper module which tests whether a building polygon feature related to the us
 
 ### populationEstimate.py
 
-I will update this later.
+This module calculates the proportional population and number of households within each risk radius using U.S. Census block-level data.  A ratio is created between the original area of the Census block feature and the post-clip area.  This ratio value is used to calculate the proportional population and number of households.
+
+For example, if a Census block feature contains 1,000 people and 500 households, but only 50% percent of it's original area is within a risk radius, then the assigned population would be 500, and the assigned number of households would be 250.  This is currently my best solution to deal with aggregrate data like Census blocks.  I am well aware of the limitations and assumptions being used.
+
+The population and number of households for each risk radii are also written to the project text file that is generated in the user-defined output directory.
 
 ### exportLayersToExcel.py
 
